@@ -20,7 +20,7 @@ import {
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 
 // Mock 모드 설정 - 백엔드 연결 시 false로 변경
-const USE_MOCK = true;
+const USE_MOCK = false;
 
 // ============================================
 // Token Management
@@ -527,7 +527,7 @@ export const curriculumApi = {
 
   async startGeneration(
     curriculumId: string
-  ): Promise<{ curriculum_id: string; status: string; estimated_time_seconds: number }> {
+  ): Promise<{ curriculum_id: string; status: string }> {
     if (USE_MOCK) {
       await delay(500);
       // 상태 업데이트
@@ -535,7 +535,6 @@ export const curriculumApi = {
       return {
         curriculum_id: curriculumId,
         status: "generating",
-        estimated_time_seconds: 30,
       };
     }
     return httpRequest(`/curriculums/${curriculumId}/generate`, {
@@ -562,7 +561,6 @@ export const curriculumApi = {
           status: "ready",
           progress_percent: 100,
           current_step: "완료!",
-          estimated_remaining_seconds: 0,
         };
       }
       return {
@@ -570,7 +568,6 @@ export const curriculumApi = {
         status: "generating",
         progress_percent: progress,
         current_step: "관계 그래프 구성 중...",
-        estimated_remaining_seconds: 5,
       };
     }
     return httpRequest<GenerationStatus>(`/curriculums/${curriculumId}/status`);

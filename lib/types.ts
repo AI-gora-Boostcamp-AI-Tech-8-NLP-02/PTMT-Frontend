@@ -194,7 +194,6 @@ export interface GenerationStatus {
   status: CurriculumStatus;
   progress_percent: number;
   current_step: string;
-  estimated_remaining_seconds?: number;
 }
 
 // ============================================
