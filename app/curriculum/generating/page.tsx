@@ -28,10 +28,7 @@ export default function GeneratingPage() {
     }
 
     // Mock: 진행률 애니메이션
-    let progressInterval: NodeJS.Timeout;
-    let stepInterval: NodeJS.Timeout;
-
-    progressInterval = setInterval(() => {
+    const progressInterval = setInterval(() => {
       setProgress(prev => {
         if (prev >= 100) {
           clearInterval(progressInterval);
@@ -41,7 +38,7 @@ export default function GeneratingPage() {
       });
     }, 100);
 
-    stepInterval = setInterval(() => {
+    const stepInterval = setInterval(() => {
       setCurrentStepIndex(prev => {
         if (prev >= loadingSteps.length - 1) {
           clearInterval(stepInterval);

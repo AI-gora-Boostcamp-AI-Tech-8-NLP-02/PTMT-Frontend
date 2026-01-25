@@ -6,12 +6,8 @@ import {
   CurriculumListItem,
   CurriculumOptions,
   GenerationStatus,
-  LearningProgress,
   LoginRequest,
-  NodeProgress,
   PaperUploadResponse,
-  ProgressStatus,
-  ProgressUpdateResponse,
   SignupRequest,
   User,
 } from "./types";
@@ -598,71 +594,6 @@ export const curriculumApi = {
     }
     await httpRequest(`/curriculums/${curriculumId}`, {
       method: "DELETE",
-    });
-  },
-};
-
-// ============================================
-// Progress API (학습 진행 상태)
-// ============================================
-
-export const progressApi = {
-  async getProgress(curriculumId: string): Promise<LearningProgress> {
-    if (USE_MOCK) {
-      await delay(300);
-      const nodes: NodeProgress[] = [
-        { keyword_id: "node-linear-algebra", status: "completed", completed_at: "2024-01-10T10:00:00Z" },
-        { keyword_id: "node-neural-network", status: "completed", completed_at: "2024-01-11T10:00:00Z" },
-        { keyword_id: "node-rnn", status: "completed", completed_at: "2024-01-12T10:00:00Z" },
-        { keyword_id: "node-word-embedding", status: "completed", completed_at: "2024-01-12T14:00:00Z" },
-        { keyword_id: "node-lstm", status: "completed", completed_at: "2024-01-13T10:00:00Z" },
-        { keyword_id: "node-seq2seq", status: "in_progress", started_at: "2024-01-14T10:00:00Z" },
-        { keyword_id: "node-attention", status: "locked" },
-        { keyword_id: "node-encoder-decoder", status: "locked" },
-        { keyword_id: "node-self-attention", status: "locked" },
-        { keyword_id: "node-scaled-dot", status: "locked" },
-        { keyword_id: "node-multi-head", status: "locked" },
-        { keyword_id: "node-positional", status: "locked" },
-        { keyword_id: "node-ffn", status: "locked" },
-        { keyword_id: "node-layer-norm", status: "locked" },
-        { keyword_id: "node-transformer", status: "locked" },
-        { keyword_id: "node-bert", status: "locked" },
-      ];
-      
-      return {
-        curriculum_id: curriculumId,
-        nodes,
-        summary: {
-          completed: 5,
-          in_progress: 1,
-          locked: 10,
-          skipped: 0,
-          total: 16,
-          percent: 31,
-        },
-      };
-    }
-    return httpRequest<LearningProgress>(`/curriculums/${curriculumId}/progress`);
-  },
-
-  async updateProgress(
-    curriculumId: string,
-    keywordId: string,
-    status: ProgressStatus
-  ): Promise<ProgressUpdateResponse> {
-    if (USE_MOCK) {
-      await delay(200);
-      console.log("Mock: Updated progress", keywordId, status);
-      return {
-        keyword_id: keywordId,
-        status,
-        updated_at: new Date().toISOString(),
-        unlocked_nodes: status === "completed" ? ["next-node-1", "next-node-2"] : [],
-      };
-    }
-    return httpRequest<ProgressUpdateResponse>(`/curriculums/${curriculumId}/progress`, {
-      method: "PATCH",
-      body: JSON.stringify({ keyword_id: keywordId, status }),
     });
   },
 };

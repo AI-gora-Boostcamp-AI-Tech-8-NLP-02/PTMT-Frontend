@@ -23,8 +23,6 @@ export type UserLevel =
   | "researcher"
   | "industry";
 
-export type ProgressStatus = "locked" | "in_progress" | "completed" | "skipped";
-
 export type ResourceType = "paper" | "article" | "video" | "code";
 
 // ============================================
@@ -197,39 +195,6 @@ export interface GenerationStatus {
   progress_percent: number;
   current_step: string;
   estimated_remaining_seconds?: number;
-}
-
-// ============================================
-// Progress Types
-// ============================================
-
-export interface NodeProgress {
-  keyword_id: string;
-  status: ProgressStatus;
-  started_at?: string | null;
-  completed_at?: string | null;
-}
-
-export interface ProgressSummary {
-  completed: number;
-  in_progress: number;
-  locked: number;
-  skipped: number;
-  total: number;
-  percent: number;
-}
-
-export interface LearningProgress {
-  curriculum_id: string;
-  nodes: NodeProgress[];
-  summary: ProgressSummary;
-}
-
-export interface ProgressUpdateResponse {
-  keyword_id: string;
-  status: ProgressStatus;
-  updated_at: string;
-  unlocked_nodes: string[];
 }
 
 // ============================================

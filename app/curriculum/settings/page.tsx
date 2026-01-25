@@ -101,7 +101,7 @@ export default function CurriculumSettingsPage() {
               커리큘럼 <span className='text-accent'>설정</span>
             </h1>
             <p className='text-slate-500'>
-              "{state.paper.title}" 논문에 맞는 커리큘럼을 설계합니다.
+              &quot;{state.paper.title}&quot; 논문에 맞는 커리큘럼을 설계합니다.
             </p>
           </div>
 

@@ -343,7 +343,7 @@ export default function CurriculumGraphPage() {
                       </div>
                       <p className='text-xs text-slate-300 leading-relaxed mb-4'>
                         This concept serves as a critical building block.
-                        Understanding "{selectedNode.keyword}" is essential
+                        Understanding &quot;{selectedNode.keyword}&quot; is essential
                         before proceeding to advanced topics.
                       </p>
 
