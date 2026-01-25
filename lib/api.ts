@@ -129,18 +129,16 @@ const mockUser: User = {
   },
 };
 
-// 논문에서 추출된 키워드 (mock)
+// 논문에서 추출된 키워드 (mock) - 1차 추출 시 name만
 const mockExtractedKeywords = [
-  { id: "kw-rnn", name: "RNN", importance: 6 },
-  { id: "kw-lstm", name: "LSTM", importance: 7 },
-  { id: "kw-seq2seq", name: "Seq2Seq", importance: 7 },
-  { id: "kw-attention", name: "Attention", importance: 10 },
-  { id: "kw-transformer", name: "Transformer", importance: 10 },
-  { id: "kw-self-attention", name: "Self-Attention", importance: 9 },
-  { id: "kw-positional", name: "Positional Encoding", importance: 8 },
-  { id: "kw-multi-head", name: "Multi-Head Attention", importance: 9 },
-  { id: "kw-feedforward", name: "Feed-Forward Network", importance: 6 },
-  { id: "kw-layer-norm", name: "Layer Normalization", importance: 5 },
+  { name: "Transformer" },
+  { name: "Attention" },
+  { name: "Self-Attention" },
+  { name: "Multi-Head Attention" },
+  { name: "Positional Encoding" },
+  { name: "Encoder-Decoder" },
+  { name: "Feed-Forward Network" },
+  { name: "Layer Normalization" },
 ];
 
 // Mock 커리큘럼 데이터 (세션 중 추가될 수 있음)

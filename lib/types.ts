@@ -72,9 +72,10 @@ export interface SignupRequest {
 // ============================================
 
 export interface Keyword {
-  id: string;
   name: string;
-  importance: number;
+  // id와 importance는 그래프 생성 후에만 존재 (1차 추출 시에는 name만)
+  id?: string;
+  importance?: number;
 }
 
 export interface Paper {
