@@ -1,14 +1,21 @@
 "use client";
 
+import { useCallback, useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+
 import { Logo } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/lib/auth-context";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 
+/**
+ * 로그인 페이지
+ *
+ * 적용된 Vercel Best Practices:
+ * - 5.9 Use Functional setState - useCallback으로 안정적인 콜백
+ */
 export default function LoginPage() {
   const router = useRouter();
   const { login } = useAuth();
@@ -18,20 +25,28 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError(null);
+  // 5.9 Use Functional setState - useCallback으로 안정적인 참조
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      setIsLoading(true);
+      setError(null);
 
-    try {
-      await login(email, password);
-      router.push("/curriculum/history");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "로그인에 실패했습니다.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+      try {
+        await login(email, password);
+        router.push("/curriculum/history");
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "로그인에 실패했습니다.");
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [email, password, login, router]
+  );
+
+  const toggleShowPassword = useCallback(() => {
+    setShowPassword(prev => !prev);
+  }, []);
 
   return (
     <div className='min-h-screen flex'>
@@ -142,7 +157,7 @@ export default function LoginPage() {
                 />
                 <button
                   type='button'
-                  onClick={() => setShowPassword(!showPassword)}
+                  onClick={toggleShowPassword}
                   className='absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors'
                 >
                   <span className='material-symbols-outlined'>

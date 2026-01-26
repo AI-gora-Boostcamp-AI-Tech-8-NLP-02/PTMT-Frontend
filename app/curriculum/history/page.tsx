@@ -1,15 +1,17 @@
 "use client";
 
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+
 import { Logo } from "@/components/layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { curriculumApi } from "@/lib/api";
 import { CurriculumListItem, CurriculumStatus } from "@/lib/types";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 
-const statusConfig: Record<
+// 6.3 Hoist Static JSX - 정적 설정 데이터
+const STATUS_CONFIG: Record<
   CurriculumStatus,
   { label: string; icon: string; color: string }
 > = {
@@ -34,8 +36,16 @@ const statusConfig: Record<
     color: "bg-green-100 text-green-700",
   },
   failed: { label: "실패", icon: "error", color: "bg-red-100 text-red-600" },
-};
+} as const;
 
+/**
+ * 커리큘럼 히스토리 페이지
+ *
+ * 적용된 Vercel Best Practices:
+ * - 5.9 Use Functional setState - useCallback으로 안정적인 콜백
+ * - 6.3 Hoist Static JSX - STATUS_CONFIG 상수화
+ * - 5.1 Calculate Derived State During Rendering - useMemo로 통계 계산
+ */
 export default function CurriculumHistoryPage() {
   const router = useRouter();
   const [curriculums, setCurriculums] = useState<CurriculumListItem[]>([]);
@@ -51,13 +61,34 @@ export default function CurriculumHistoryPage() {
     fetchData();
   }, []);
 
-  const handleDelete = async (id: string, e: React.MouseEvent) => {
+  // 5.1 Calculate Derived State During Rendering
+  const stats = useMemo(
+    () => ({
+      total: curriculums.length,
+      completed: curriculums.filter(c => c.status === "ready").length,
+      totalHours: curriculums.reduce(
+        (acc, c) => acc + (c.estimated_hours || 0),
+        0
+      ),
+    }),
+    [curriculums]
+  );
+
+  // 5.9 Use Functional setState - useCallback으로 안정적인 참조
+  const handleDelete = useCallback(async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     if (confirm("이 커리큘럼을 삭제하시겠습니까?")) {
       await curriculumApi.delete(id);
       setCurriculums(prev => prev.filter(c => c.id !== id));
     }
-  };
+  }, []);
+
+  const handleItemClick = useCallback(
+    (id: string) => {
+      router.push(`/curriculum/${id}`);
+    },
+    [router]
+  );
 
   return (
     <div className='min-h-screen bg-background'>
@@ -85,7 +116,7 @@ export default function CurriculumHistoryPage() {
           </p>
         </div>
 
-        {/* Stats */}
+        {/* Stats - 5.1 Derived State */}
         <div className='grid grid-cols-3 gap-4 mb-8'>
           <div className='bg-white rounded-2xl p-5 border border-slate-200'>
             <div className='flex items-center gap-3 mb-2'>
@@ -94,7 +125,7 @@ export default function CurriculumHistoryPage() {
                   library_books
                 </span>
               </div>
-              <span className='text-2xl font-black'>{curriculums.length}</span>
+              <span className='text-2xl font-black'>{stats.total}</span>
             </div>
             <p className='text-sm text-slate-500'>전체 커리큘럼</p>
           </div>
@@ -105,9 +136,7 @@ export default function CurriculumHistoryPage() {
                   check_circle
                 </span>
               </div>
-              <span className='text-2xl font-black'>
-                {curriculums.filter(c => c.status === "ready").length}
-              </span>
+              <span className='text-2xl font-black'>{stats.completed}</span>
             </div>
             <p className='text-sm text-slate-500'>완료됨</p>
           </div>
@@ -119,9 +148,7 @@ export default function CurriculumHistoryPage() {
                 </span>
               </div>
               <span className='text-2xl font-black'>
-                {curriculums
-                  .reduce((acc, c) => acc + (c.estimated_hours || 0), 0)
-                  .toFixed(0)}
+                {stats.totalHours.toFixed(0)}
               </span>
             </div>
             <p className='text-sm text-slate-500'>총 학습 시간</p>
@@ -150,11 +177,11 @@ export default function CurriculumHistoryPage() {
         ) : (
           <div className='space-y-3'>
             {curriculums.map(c => {
-              const status = statusConfig[c.status] || statusConfig.draft;
+              const status = STATUS_CONFIG[c.status] || STATUS_CONFIG.draft;
               return (
                 <div
                   key={c.id}
-                  onClick={() => router.push(`/curriculum/${c.id}`)}
+                  onClick={() => handleItemClick(c.id)}
                   className='group flex items-center gap-5 p-5 bg-white rounded-2xl border border-slate-200 hover:border-primary/30 hover:shadow-md transition-all cursor-pointer'
                 >
                   {/* Icon */}

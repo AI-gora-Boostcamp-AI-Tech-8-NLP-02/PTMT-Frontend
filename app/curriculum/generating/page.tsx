@@ -1,22 +1,30 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+
 import { Logo } from "@/components/layout";
 import { useCurriculum } from "@/lib/curriculum-context";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 
-const loadingSteps = [
+// 6.3 Hoist Static JSX - 정적 데이터를 컴포넌트 외부로
+const LOADING_STEPS = [
   { label: "논문 분석 중", icon: "description" },
   { label: "핵심 개념 추출", icon: "hub" },
   { label: "학습 순서 최적화", icon: "route" },
   { label: "자료 탐색", icon: "search" },
   { label: "커리큘럼 생성", icon: "auto_awesome" },
-];
+] as const;
 
+/**
+ * 커리큘럼 생성 로딩 페이지
+ *
+ * 적용된 Vercel Best Practices:
+ * - 6.3 Hoist Static JSX - LOADING_STEPS 상수화
+ * - 5.9 Use Functional setState - setProgress에 함수형 업데이트
+ */
 export default function GeneratingPage() {
   const router = useRouter();
-  const { state, updateProgress, completeGeneration, failGeneration } =
-    useCurriculum();
+  const { state, completeGeneration } = useCurriculum();
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [progress, setProgress] = useState(0);
 
@@ -27,7 +35,7 @@ export default function GeneratingPage() {
       return;
     }
 
-    // Mock: 진행률 애니메이션
+    // Mock: 진행률 애니메이션 (5.9 Use Functional setState)
     const progressInterval = setInterval(() => {
       setProgress(prev => {
         if (prev >= 100) {
@@ -40,7 +48,7 @@ export default function GeneratingPage() {
 
     const stepInterval = setInterval(() => {
       setCurrentStepIndex(prev => {
-        if (prev >= loadingSteps.length - 1) {
+        if (prev >= LOADING_STEPS.length - 1) {
           clearInterval(stepInterval);
           return prev;
         }
@@ -124,7 +132,7 @@ export default function GeneratingPage() {
           {/* Center content */}
           <div className='absolute inset-0 flex flex-col items-center justify-center'>
             <span className='material-symbols-outlined text-4xl text-primary mb-1 animate-bounce'>
-              {loadingSteps[currentStepIndex]?.icon || "hourglass_empty"}
+              {LOADING_STEPS[currentStepIndex]?.icon || "hourglass_empty"}
             </span>
             <span className='text-2xl font-bold text-foreground'>
               {progress}%
@@ -137,12 +145,12 @@ export default function GeneratingPage() {
           커리큘럼 생성 중
         </h2>
         <p className='text-sm text-muted-foreground mb-8'>
-          {loadingSteps[currentStepIndex]?.label || "잠시만 기다려주세요..."}
+          {LOADING_STEPS[currentStepIndex]?.label || "잠시만 기다려주세요..."}
         </p>
 
         {/* Step indicators */}
         <div className='flex items-center gap-3 bg-white/60 backdrop-blur-sm rounded-2xl px-6 py-4 shadow-sm border border-white/40'>
-          {loadingSteps.map((step, idx) => (
+          {LOADING_STEPS.map((_, idx) => (
             <div
               key={idx}
               className={`

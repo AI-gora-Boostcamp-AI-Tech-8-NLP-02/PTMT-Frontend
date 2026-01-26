@@ -1,5 +1,6 @@
 "use client";
 
+import { memo, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
 import Link from "next/link";
@@ -10,7 +11,14 @@ interface HeaderProps {
   variant?: "default" | "transparent" | "dark";
 }
 
-export function Header({ variant = "default" }: HeaderProps) {
+// 6.3 Hoist Static JSX - 정적 네비게이션 링크
+const NAV_LINKS = [
+  { href: "#how-it-works", label: "작동 방식" },
+  { href: "/curriculum/history", label: "내 커리큘럼" },
+] as const;
+
+// 5.5 Extract to Memoized Components
+export const Header = memo(function Header({ variant = "default" }: HeaderProps) {
   const router = useRouter();
   const { user, isAuthenticated, isLoading, logout } = useAuth();
 
@@ -20,10 +28,11 @@ export function Header({ variant = "default" }: HeaderProps) {
     dark: "bg-foreground text-background",
   }[variant];
 
-  const handleLogout = async () => {
+  // 5.9 Use Functional setState - useCallback으로 안정적인 참조
+  const handleLogout = useCallback(async () => {
     await logout();
     router.push("/");
-  };
+  }, [logout, router]);
 
   return (
     <header className={`sticky top-0 z-50 ${bgClass}`}>
@@ -33,10 +42,7 @@ export function Header({ variant = "default" }: HeaderProps) {
 
           {/* Navigation - Bold style */}
           <nav className='hidden md:flex items-center gap-1'>
-            {[
-              { href: "#how-it-works", label: "작동 방식" },
-              { href: "/curriculum/history", label: "내 커리큘럼" },
-            ].map(item => (
+            {NAV_LINKS.map(item => (
               <Link
                 key={item.href}
                 href={item.href}
@@ -127,4 +133,4 @@ export function Header({ variant = "default" }: HeaderProps) {
       </div>
     </header>
   );
-}
+});

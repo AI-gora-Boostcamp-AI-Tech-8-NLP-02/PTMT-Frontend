@@ -1,7 +1,20 @@
+import { memo } from "react";
 import Link from "next/link";
 import { Logo } from "./Logo";
 
-export function Footer() {
+// 6.3 Hoist Static JSX - 정적 데이터
+const SERVICE_LINKS = [
+  { href: "/curriculum/upload-paper", label: "논문 업로드" },
+  { href: "/curriculum/history", label: "내 커리큘럼" },
+] as const;
+
+const LEGAL_LINKS = [
+  { href: "#", label: "이용약관" },
+  { href: "#", label: "개인정보 처리방침" },
+] as const;
+
+// 5.5 Extract to Memoized Components
+export const Footer = memo(function Footer() {
   return (
     <footer className='bg-foreground text-background py-16 relative overflow-hidden'>
       {/* Subtle gradient orbs */}
@@ -25,22 +38,16 @@ export function Footer() {
               서비스
             </h4>
             <ul className='space-y-3'>
-              <li>
-                <Link
-                  href='/curriculum/upload-paper'
-                  className='text-background/70 hover:text-primary transition-colors'
-                >
-                  논문 업로드
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href='/curriculum/history'
-                  className='text-background/70 hover:text-primary transition-colors'
-                >
-                  내 커리큘럼
-                </Link>
-              </li>
+              {SERVICE_LINKS.map(link => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className='text-background/70 hover:text-primary transition-colors'
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -49,22 +56,16 @@ export function Footer() {
               법적 고지
             </h4>
             <ul className='space-y-3'>
-              <li>
-                <Link
-                  href='#'
-                  className='text-background/70 hover:text-primary transition-colors'
-                >
-                  이용약관
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href='#'
-                  className='text-background/70 hover:text-primary transition-colors'
-                >
-                  개인정보 처리방침
-                </Link>
-              </li>
+              {LEGAL_LINKS.map(link => (
+                <li key={link.label}>
+                  <Link
+                    href={link.href}
+                    className='text-background/70 hover:text-primary transition-colors'
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
@@ -96,4 +97,4 @@ export function Footer() {
       </div>
     </footer>
   );
-}
+});

@@ -1,14 +1,22 @@
 "use client";
 
+import { useCallback, useState } from "react";
+import { useRouter } from "next/navigation";
+
 import { Header } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { paperApi } from "@/lib/api";
 import { useCurriculum } from "@/lib/curriculum-context";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 
+/**
+ * 논문 업로드 페이지
+ *
+ * 적용된 Vercel Best Practices:
+ * - 5.9 Use Functional setState - useCallback으로 안정적인 콜백
+ * - 7.8 Early Return - 조건부 early return
+ */
 export default function UploadPaperPage() {
   const router = useRouter();
   const { setPaper } = useCurriculum();
@@ -19,30 +27,34 @@ export default function UploadPaperPage() {
   const [title, setTitle] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  const handleFileSelect = async (file: File) => {
-    setIsLoading(true);
-    setError(null);
+  // 5.9 Use Functional setState - useCallback으로 안정적인 참조
+  const handleFileSelect = useCallback(
+    async (file: File) => {
+      setIsLoading(true);
+      setError(null);
 
-    try {
-      const response = await paperApi.uploadPdf(file);
-      setPaper(
-        {
-          paperId: response.paper_id,
-          title: response.title,
-          abstract: response.abstract,
-          keywords: response.keywords,
-        },
-        response.curriculum_id
-      );
-      router.push("/curriculum/settings");
-    } catch (err) {
-      setError("PDF 업로드에 실패했습니다.");
-      setIsLoading(false);
-    }
-  };
+      try {
+        const response = await paperApi.uploadPdf(file);
+        setPaper(
+          {
+            paperId: response.paper_id,
+            title: response.title,
+            abstract: response.abstract,
+            keywords: response.keywords,
+          },
+          response.curriculum_id
+        );
+        router.push("/curriculum/settings");
+      } catch {
+        setError("PDF 업로드에 실패했습니다.");
+        setIsLoading(false);
+      }
+    },
+    [setPaper, router]
+  );
 
-  const handleLinkSubmit = async () => {
-    if (!url.trim()) return;
+  const handleLinkSubmit = useCallback(async () => {
+    if (!url.trim()) return; // 7.8 Early Return
     setIsLoading(true);
     setError(null);
 
@@ -58,14 +70,14 @@ export default function UploadPaperPage() {
         response.curriculum_id
       );
       router.push("/curriculum/settings");
-    } catch (err) {
+    } catch {
       setError("링크 분석에 실패했습니다.");
       setIsLoading(false);
     }
-  };
+  }, [url, setPaper, router]);
 
-  const handleTitleSubmit = async () => {
-    if (!title.trim()) return;
+  const handleTitleSubmit = useCallback(async () => {
+    if (!title.trim()) return; // 7.8 Early Return
     setIsLoading(true);
     setError(null);
 
@@ -81,11 +93,44 @@ export default function UploadPaperPage() {
         response.curriculum_id
       );
       router.push("/curriculum/settings");
-    } catch (err) {
+    } catch {
       setError("논문 검색에 실패했습니다.");
       setIsLoading(false);
     }
-  };
+  }, [title, setPaper, router]);
+
+  // Drag handlers with useCallback
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  }, []);
+
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  }, []);
+
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      setIsDragging(false);
+      const file = e.dataTransfer.files[0];
+      if (file?.type === "application/pdf") handleFileSelect(file);
+    },
+    [handleFileSelect]
+  );
+
+  const handleFileInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) handleFileSelect(file);
+    },
+    [handleFileSelect]
+  );
+
+  const handleBack = useCallback(() => {
+    router.back();
+  }, [router]);
 
   return (
     <div className='min-h-screen flex flex-col bg-background'>
@@ -111,7 +156,7 @@ export default function UploadPaperPage() {
                 </p>
               </div>
               <button
-                onClick={() => router.back()}
+                onClick={handleBack}
                 className='size-11 flex items-center justify-center rounded-2xl bg-slate-100 text-slate-500 hover:bg-accent/20 hover:text-accent transition-all'
               >
                 <span className='material-symbols-outlined'>close</span>
@@ -170,21 +215,9 @@ export default function UploadPaperPage() {
               <div className='p-8'>
                 <TabsContent value='pdf' className='mt-0'>
                   <div
-                    onDragOver={e => {
-                      e.preventDefault();
-                      setIsDragging(true);
-                    }}
-                    onDragLeave={e => {
-                      e.preventDefault();
-                      setIsDragging(false);
-                    }}
-                    onDrop={e => {
-                      e.preventDefault();
-                      setIsDragging(false);
-                      const file = e.dataTransfer.files[0];
-                      if (file?.type === "application/pdf")
-                        handleFileSelect(file);
-                    }}
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
                     className={`
                       relative flex flex-col items-center justify-center gap-4 
                       rounded-3xl border-[3px] border-dashed 
@@ -199,10 +232,7 @@ export default function UploadPaperPage() {
                     <input
                       type='file'
                       accept='.pdf'
-                      onChange={e =>
-                        e.target.files?.[0] &&
-                        handleFileSelect(e.target.files[0])
-                      }
+                      onChange={handleFileInputChange}
                       className='absolute inset-0 w-full h-full opacity-0 cursor-pointer'
                       disabled={isLoading}
                     />

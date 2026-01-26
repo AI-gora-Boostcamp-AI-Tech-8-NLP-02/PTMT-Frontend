@@ -20,7 +20,7 @@ import {
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 
 // Mock 모드 설정 - 백엔드 연결 시 false로 변경
-const USE_MOCK = false;
+const USE_MOCK = true;
 
 // ============================================
 // Token Management
