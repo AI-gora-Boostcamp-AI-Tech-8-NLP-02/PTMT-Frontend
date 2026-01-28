@@ -3,7 +3,7 @@
 import { Header } from "@/components/layout";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
-import UploadTabs from "./components/UploadTabs";
+import UploadTabs from "./_components/UploadTabs";
 
 /**
  * 논문 업로드 페이지

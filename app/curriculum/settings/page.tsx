@@ -8,11 +8,11 @@ import { Button } from "@/components/ui/button";
 import { curriculumApi } from "@/lib/api";
 import { useCurriculum } from "@/lib/curriculum-context";
 import { CurriculumPurpose, ResourceType, UserLevel } from "@/lib/types";
-import { KnownConceptsSection } from "./components/KnownConceptsSection";
-import { LevelSection } from "./components/LevelSection";
-import { PurposeSection } from "./components/PurposeSection";
-import { ResourcesSection } from "./components/ResourcesSection";
-import { TimeSection } from "./components/TimeSection";
+import { KnownConceptsSection } from "./_components/KnownConceptsSection";
+import { LevelSection } from "./_components/LevelSection";
+import { PurposeSection } from "./_components/PurposeSection";
+import { ResourcesSection } from "./_components/ResourcesSection";
+import { TimeSection } from "./_components/TimeSection";
 
 /**
  * 커리큘럼 설정 페이지
