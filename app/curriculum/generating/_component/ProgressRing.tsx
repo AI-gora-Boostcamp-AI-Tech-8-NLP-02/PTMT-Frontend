@@ -1,14 +1,9 @@
 interface ProgressRingProps {
   progress: number; // 0 ~ 100
-  size?: number; // px
   strokeWidth?: number;
 }
 
-export function ProgressRing({
-  progress,
-  size = 160,
-  strokeWidth = 6,
-}: ProgressRingProps) {
+export function ProgressRing({ progress, strokeWidth = 6 }: ProgressRingProps) {
   const radius = 70;
   const circumference = 2 * Math.PI * radius;
   const dash = (progress / 100) * circumference;
