@@ -60,7 +60,8 @@ export const Logo = memo(function Logo({
         <span
           className={`${sizes.title} font-black tracking-tight ${textColor} leading-none`}
         >
-          페튜<span className='text-primary'>와</span>매튜
+          <span className='text-primary'>페튜</span>와
+          <span className='text-accent'>매튜</span>
         </span>
         {showSubtitle && (
           <span
