@@ -71,14 +71,18 @@ export default function LoginForm({
                 onChange={e => onPasswordChange(e.target.value)}
                 disabled={isLoading}
                 required
+                className='pr-14' // 버튼 공간 확보
               />
+
               <button
                 type='button'
                 onClick={onTogglePassword}
-                className='absolute right-4 top-1/2 -translate-y-1/2'
+                className='absolute right-2 top-1/2 -translate-y-1/2
+               h-10 w-10 flex items-center justify-center
+               rounded-lg hover:bg-slate-100 transition-colors'
               >
-                <span className='material-symbols-outlined'>
-                  {showPassword ? "visibility_off" : "visibility"}
+                <span className='material-symbols-outlined text-xl'>
+                  {showPassword ? "visibility" : "visibility_off"}
                 </span>
               </button>
             </div>
