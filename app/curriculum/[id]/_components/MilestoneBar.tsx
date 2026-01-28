@@ -1,8 +1,8 @@
 "use client";
 
-import { memo, useCallback } from "react";
 import { CurriculumNode } from "@/lib/types";
-import { RESOURCE_TYPE_ICONS } from "./constants";
+import { memo, useCallback } from "react";
+import { RESOURCE_TYPE_ICONS } from "../../../const/resourceTypeIcons";
 
 interface NodePosition {
   x: number;
@@ -42,18 +42,22 @@ export const MilestoneBar = memo(function MilestoneBar({
   );
 
   return (
-    <div className="h-60 bg-white border-t border-slate-200 shrink-0 z-30 shadow-[0_-10px_40px_rgba(0,0,0,0.03)] flex flex-col">
-      <div className="px-8 py-4 border-b border-slate-100 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-amber-500">stars</span>
-          <h3 className="font-bold text-slate-800 text-lg">Learning Milestones</h3>
+    <div className='h-60 bg-white border-t border-slate-200 shrink-0 z-30 shadow-[0_-10px_40px_rgba(0,0,0,0.03)] flex flex-col'>
+      <div className='px-8 py-4 border-b border-slate-100 flex items-center justify-between'>
+        <div className='flex items-center gap-2'>
+          <span className='material-symbols-outlined text-amber-500'>
+            stars
+          </span>
+          <h3 className='font-bold text-slate-800 text-lg'>
+            Learning Milestones
+          </h3>
         </div>
-        <span className="text-xs font-medium text-slate-400 bg-slate-50 px-3 py-1 rounded-full">
+        <span className='text-xs font-medium text-slate-400 bg-slate-50 px-3 py-1 rounded-full'>
           The Recommended Sequence
         </span>
       </div>
 
-      <div className="flex-1 flex items-center gap-6 overflow-x-auto px-8 py-2 custom-scrollbar">
+      <div className='flex-1 flex items-center gap-6 overflow-x-auto px-8 py-2 custom-scrollbar'>
         {nodes.map((node, idx) => {
           const isSelected = selectedNodeId === node.keyword_id;
 
@@ -62,7 +66,7 @@ export const MilestoneBar = memo(function MilestoneBar({
               key={node.keyword_id}
               onClick={() => handleNodeClick(node)}
               className={`
-                group flex flex-col items-center gap-3 min-w-[100px] transition-all duration-300
+                group flex flex-col items-center gap-3 min-w-25 transition-all duration-300
                 ${isSelected ? "scale-110 opacity-100" : "opacity-70 hover:opacity-100 hover:scale-105"}
               `}
             >
@@ -91,7 +95,7 @@ export const MilestoneBar = memo(function MilestoneBar({
               </div>
 
               {/* Label */}
-              <div className="text-center">
+              <div className='text-center'>
                 <span
                   className={`text-xs font-bold block whitespace-nowrap ${isSelected ? "text-blue-700" : "text-slate-600"}`}
                 >

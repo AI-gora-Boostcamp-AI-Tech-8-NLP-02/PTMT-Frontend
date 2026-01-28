@@ -1,29 +1,27 @@
 "use client";
 
-import { useMemo, useState, useCallback } from "react";
 import Link from "next/link";
+import { useCallback, useMemo, useState } from "react";
 
 import { Logo } from "@/components/layout";
 import { Button } from "@/components/ui/button";
-import {
-  GraphSidebar,
-  GraphCanvas,
-  MilestoneBar,
-  ZoomControls,
-} from "@/components/curriculum";
 import { useGraphLayout, useZoomPan } from "@/hooks";
 import { dummyCurriculumGraph } from "@/lib/dummy-curriculum";
 import { CurriculumNode } from "@/lib/types";
+import { GraphCanvas } from "./_components/GraphCanvas";
+import { GraphSidebar } from "./_components/GraphSidebar";
+import { MilestoneBar } from "./_components/MilestoneBar";
+import { ZoomControls } from "./_components/ZoomControls";
 
 /**
  * 커리큘럼 그래프 페이지
- * 
+ *
  * 컴포넌트 구조:
  * - GraphSidebar: 선택된 노드 상세 정보
  * - GraphCanvas: 그래프 SVG 시각화
  * - MilestoneBar: 하단 학습 마일스톤
  * - ZoomControls: 줌 컨트롤
- * 
+ *
  * 커스텀 훅:
  * - useGraphLayout: 노드 레이아웃 계산
  * - useZoomPan: 줌/팬 상태 관리
@@ -77,34 +75,34 @@ export default function CurriculumGraphPage() {
   }, []);
 
   return (
-    <div className="flex flex-col h-screen bg-slate-50 overflow-hidden">
+    <div className='flex flex-col h-screen bg-slate-50 overflow-hidden'>
       {/* Header */}
-      <header className="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-6 shrink-0 z-30 relative">
-        <div className="flex items-center gap-4">
-          <Logo size="sm" />
-          <div className="w-px h-6 bg-slate-200" />
+      <header className='h-14 bg-white border-b border-slate-200 flex items-center justify-between px-6 shrink-0 z-30 relative'>
+        <div className='flex items-center gap-4'>
+          <Logo size='sm' />
+          <div className='w-px h-6 bg-slate-200' />
           <div>
-            <h1 className="text-sm font-bold text-slate-900">
+            <h1 className='text-sm font-bold text-slate-900'>
               {graph.meta.paper_title}
             </h1>
-            <p className="text-xs text-slate-500">
+            <p className='text-xs text-slate-500'>
               {graph.nodes.length} Key Concepts •{" "}
               {graph.meta.total_study_time_hours} Hours
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 text-green-600 text-xs font-medium bg-green-50 px-3 py-1 rounded-full">
-            <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
+        <div className='flex items-center gap-3'>
+          <div className='flex items-center gap-2 text-green-600 text-xs font-medium bg-green-50 px-3 py-1 rounded-full'>
+            <span className='w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse' />
             AI Learning Path Active
           </div>
-          <Link href="/curriculum/history">
+          <Link href='/curriculum/history'>
             <Button
-              variant="outline"
-              size="sm"
-              className="rounded-lg text-xs gap-1.5 h-8"
+              variant='outline'
+              size='sm'
+              className='rounded-lg text-xs gap-1.5 h-8'
             >
-              <span className="material-symbols-outlined text-base">
+              <span className='material-symbols-outlined text-base'>
                 dashboard
               </span>
               Dashboard
@@ -113,7 +111,7 @@ export default function CurriculumGraphPage() {
         </div>
       </header>
 
-      <div className="flex flex-1 overflow-hidden relative">
+      <div className='flex flex-1 overflow-hidden relative'>
         {/* Sidebar - 선택된 노드 상세 정보 */}
         <GraphSidebar
           selectedNode={selectedNode}
@@ -121,7 +119,7 @@ export default function CurriculumGraphPage() {
         />
 
         {/* Graph Area */}
-        <section className="flex-1 flex flex-col relative bg-[#f8fafc] overflow-hidden">
+        <section className='flex-1 flex flex-col relative bg-[#f8fafc] overflow-hidden'>
           {/* Zoom Controls */}
           <ZoomControls
             onZoomIn={zoomIn}
