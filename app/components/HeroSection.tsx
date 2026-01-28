@@ -62,12 +62,12 @@ export default function HeroSection() {
                 <Button
                   size='lg'
                   className='group flex items-center justify-center gap-2 rounded-lg h-14 px-8 bg-primary text-[#181611] text-base font-bold shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all duration-200 min-w-50'
-                  onClick={() => router.push("/auth/login")}
+                  onClick={() => router.push("/curriculum/upload-paper")}
                 >
                   <span className='material-symbols-outlined text-2xl icon-filled'>
                     rocket_launch
                   </span>
-                  논문 업로드
+                  지금 시작하기
                 </Button>
               </div>
             </div>
