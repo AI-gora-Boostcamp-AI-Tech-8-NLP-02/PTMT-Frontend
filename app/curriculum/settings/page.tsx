@@ -1,20 +1,18 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
 
 import { Header } from "@/components/layout";
 import { Button } from "@/components/ui/button";
-import {
-  PurposeSection,
-  LevelSection,
-  KnownConceptsSection,
-  TimeSection,
-  ResourcesSection,
-} from "@/components/settings";
 import { curriculumApi } from "@/lib/api";
 import { useCurriculum } from "@/lib/curriculum-context";
 import { CurriculumPurpose, ResourceType, UserLevel } from "@/lib/types";
+import { KnownConceptsSection } from "./components/KnownConceptsSection";
+import { LevelSection } from "./components/LevelSection";
+import { PurposeSection } from "./components/PurposeSection";
+import { ResourcesSection } from "./components/ResourcesSection";
+import { TimeSection } from "./components/TimeSection";
 
 /**
  * 커리큘럼 설정 페이지
@@ -116,22 +114,22 @@ export default function CurriculumSettingsPage() {
   const extractedKeywords = state.paper.keywords || [];
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className='min-h-screen flex flex-col bg-background'>
       <Header />
 
-      <main className="flex-1 py-10 px-6">
-        <div className="max-w-[900px] mx-auto">
+      <main className='flex-1 py-10 px-6'>
+        <div className='max-w-225 mx-auto'>
           {/* Header */}
-          <div className="mb-10">
-            <h1 className="text-3xl md:text-4xl font-black tracking-tight mb-2">
-              커리큘럼 <span className="text-accent">설정</span>
+          <div className='mb-10'>
+            <h1 className='text-3xl md:text-4xl font-black tracking-tight mb-2'>
+              커리큘럼 <span className='text-accent'>설정</span>
             </h1>
-            <p className="text-slate-500">
+            <p className='text-slate-500'>
               &quot;{state.paper.title}&quot; 논문에 맞는 커리큘럼을 설계합니다.
             </p>
           </div>
 
-          <div className="space-y-6">
+          <div className='space-y-6'>
             {/* 1. Purpose */}
             <PurposeSection value={purpose} onChange={handlePurposeChange} />
 
@@ -146,7 +144,7 @@ export default function CurriculumSettingsPage() {
             />
 
             {/* 4 & 5. Time & Resources */}
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className='grid md:grid-cols-2 gap-6'>
               <TimeSection
                 studyDays={studyDays}
                 dailyHours={dailyHours}
@@ -160,30 +158,30 @@ export default function CurriculumSettingsPage() {
             </div>
 
             {/* Submit */}
-            <div className="pt-6 pb-12">
+            <div className='pt-6 pb-12'>
               <Button
                 onClick={handleSubmit}
                 disabled={isSubmitting}
-                className="w-full h-14 rounded-full text-lg font-black bg-primary text-slate-900 hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5 disabled:opacity-50"
+                className='w-full h-14 rounded-full text-lg font-black bg-primary text-slate-900 hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5 disabled:opacity-50'
               >
                 {isSubmitting ? (
-                  <span className="flex items-center gap-2">
-                    <span className="material-symbols-outlined animate-spin">
+                  <span className='flex items-center gap-2'>
+                    <span className='material-symbols-outlined animate-spin'>
                       progress_activity
                     </span>
                     처리 중...
                   </span>
                 ) : (
-                  <span className="flex items-center gap-2">
-                    <span className="material-symbols-outlined text-xl icon-filled">
+                  <span className='flex items-center gap-2'>
+                    <span className='material-symbols-outlined text-xl icon-filled'>
                       auto_awesome
                     </span>
                     나만의 커리큘럼 생성하기
                   </span>
                 )}
               </Button>
-              <p className="text-center text-xs text-slate-400 mt-4 flex items-center justify-center gap-1">
-                <span className="material-symbols-outlined text-[14px]">
+              <p className='text-center text-xs text-slate-400 mt-4 flex items-center justify-center gap-1'>
+                <span className='material-symbols-outlined text-[14px]'>
                   info
                 </span>
                 복잡도에 따라 AI 생성에 최대 30초가 소요될 수 있어요.
