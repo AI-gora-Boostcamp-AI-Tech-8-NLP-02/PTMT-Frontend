@@ -5,22 +5,13 @@ import { useEffect, useState } from "react";
 
 import { Logo } from "@/components/layout";
 import { useCurriculum } from "@/lib/curriculum-context";
+import { LOADING_STEPS } from "../../const/loadingStep";
+import LoadingIndicator from "./_component/LoadingIndicator";
+import LoadingSteps from "./_component/LoadingSteps";
+import PaperInfoCard from "./_component/PaperInfoCard";
 
-// 6.3 Hoist Static JSX - 정적 데이터를 컴포넌트 외부로
-const LOADING_STEPS = [
-  { label: "논문 분석 중", icon: "description" },
-  { label: "핵심 개념 추출", icon: "hub" },
-  { label: "학습 순서 최적화", icon: "route" },
-  { label: "자료 탐색", icon: "search" },
-  { label: "커리큘럼 생성", icon: "auto_awesome" },
-] as const;
-
-/**
+/*
  * 커리큘럼 생성 로딩 페이지
- *
- * 적용된 Vercel Best Practices:
- * - 6.3 Hoist Static JSX - LOADING_STEPS 상수화
- * - 5.9 Use Functional setState - setProgress에 함수형 업데이트
  */
 export default function GeneratingPage() {
   const router = useRouter();
@@ -91,54 +82,7 @@ export default function GeneratingPage() {
         </div>
 
         {/* Main loading indicator */}
-        <div className='relative w-40 h-40 mb-10'>
-          {/* Outer ring */}
-          <svg className='w-full h-full -rotate-90' viewBox='0 0 160 160'>
-            <circle
-              cx='80'
-              cy='80'
-              r='70'
-              fill='none'
-              stroke='currentColor'
-              strokeWidth='4'
-              className='text-muted'
-            />
-            <circle
-              cx='80'
-              cy='80'
-              r='70'
-              fill='none'
-              stroke='url(#progressGradient)'
-              strokeWidth='6'
-              strokeLinecap='round'
-              strokeDasharray={`${progress * 4.4} 440`}
-              className='transition-all duration-300'
-            />
-            <defs>
-              <linearGradient
-                id='progressGradient'
-                x1='0%'
-                y1='0%'
-                x2='100%'
-                y2='100%'
-              >
-                <stop offset='0%' stopColor='var(--primary)' />
-                <stop offset='50%' stopColor='var(--accent)' />
-                <stop offset='100%' stopColor='var(--secondary)' />
-              </linearGradient>
-            </defs>
-          </svg>
-
-          {/* Center content */}
-          <div className='absolute inset-0 flex flex-col items-center justify-center'>
-            <span className='material-symbols-outlined text-4xl text-primary mb-1 animate-bounce'>
-              {LOADING_STEPS[currentStepIndex]?.icon || "hourglass_empty"}
-            </span>
-            <span className='text-2xl font-bold text-foreground'>
-              {progress}%
-            </span>
-          </div>
-        </div>
+        <LoadingIndicator progress={progress} stepIndex={currentStepIndex} />
 
         {/* Status text */}
         <h2 className='text-xl font-bold text-foreground mb-2'>
@@ -149,28 +93,14 @@ export default function GeneratingPage() {
         </p>
 
         {/* Step indicators */}
-        <div className='flex items-center gap-3 bg-white/60 backdrop-blur-sm rounded-2xl px-6 py-4 shadow-sm border border-white/40'>
-          {LOADING_STEPS.map((_, idx) => (
-            <div
-              key={idx}
-              className={`
-                w-3 h-3 rounded-full transition-all duration-500
-                ${idx < currentStepIndex ? "bg-primary scale-100" : ""}
-                ${idx === currentStepIndex ? "bg-accent scale-125 animate-pulse" : ""}
-                ${idx > currentStepIndex ? "bg-muted scale-100" : ""}
-              `}
-            />
-          ))}
-        </div>
+        <LoadingSteps
+          currentStepIndex={currentStepIndex}
+          total={LOADING_STEPS.length}
+        />
 
         {/* Paper info */}
         {state.paper && (
-          <div className='mt-10 p-4 bg-white/50 backdrop-blur-sm rounded-xl border border-white/40 w-full'>
-            <p className='text-xs text-muted-foreground mb-1'>분석 중인 논문</p>
-            <p className='text-sm font-semibold text-foreground truncate'>
-              {state.paper.title}
-            </p>
-          </div>
+          <PaperInfoCard title={state.paper.title} key={state.paper.paperId} />
         )}
       </div>
     </div>
