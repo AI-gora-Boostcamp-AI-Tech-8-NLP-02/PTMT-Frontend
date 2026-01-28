@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 import { Logo } from "@/components/layout";
 import { useCurriculum } from "@/lib/curriculum-context";
@@ -70,7 +70,7 @@ export default function GeneratingPage() {
   }, [state.curriculumId, router, completeGeneration]);
 
   return (
-    <div className='min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-secondary/20 via-background to-primary/10 relative overflow-hidden'>
+    <div className='min-h-screen flex flex-col items-center justify-center bg-linear-to-br from-secondary/20 via-background to-primary/10 relative overflow-hidden'>
       {/* Background decorative elements */}
       <div className='absolute inset-0 pointer-events-none'>
         <div className='absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse' />

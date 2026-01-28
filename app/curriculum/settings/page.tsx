@@ -16,11 +16,6 @@ import { TimeSection } from "./_components/TimeSection";
 
 /**
  * 커리큘럼 설정 페이지
- *
- * 적용된 Vercel Best Practices:
- * - 5.5 Extract to Memoized Components - 각 섹션을 별도 컴포넌트로 분리
- * - 5.9 Use Functional setState - useCallback으로 안정적인 콜백
- * - 6.3 Hoist Static JSX - 정적 데이터를 각 컴포넌트에서 상수로 분리
  */
 export default function CurriculumSettingsPage() {
   const router = useRouter();
@@ -180,12 +175,6 @@ export default function CurriculumSettingsPage() {
                   </span>
                 )}
               </Button>
-              <p className='text-center text-xs text-slate-400 mt-4 flex items-center justify-center gap-1'>
-                <span className='material-symbols-outlined text-[14px]'>
-                  info
-                </span>
-                복잡도에 따라 AI 생성에 최대 30초가 소요될 수 있어요.
-              </p>
             </div>
           </div>
         </div>
