@@ -96,7 +96,7 @@ export default function CurriculumGraphPage() {
             <span className='w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse' />
             AI Learning Path Active
           </div>
-          <Link href='/curriculum/history'>
+          <Link href='/user/history'>
             <Button
               variant='outline'
               size='sm'

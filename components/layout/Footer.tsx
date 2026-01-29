@@ -1,11 +1,11 @@
-import { memo } from "react";
 import Link from "next/link";
+import { memo } from "react";
 import { Logo } from "./Logo";
 
 // 6.3 Hoist Static JSX - 정적 데이터
 const SERVICE_LINKS = [
   { href: "/curriculum/upload-paper", label: "논문 업로드" },
-  { href: "/curriculum/history", label: "내 커리큘럼" },
+  { href: "/user/history", label: "내 커리큘럼" },
 ] as const;
 
 const LEGAL_LINKS = [
@@ -21,7 +21,7 @@ export const Footer = memo(function Footer() {
       <div className='absolute top-0 left-1/4 w-64 h-64 rounded-full bg-primary/10 blur-[100px]' />
       <div className='absolute bottom-0 right-1/4 w-64 h-64 rounded-full bg-accent/10 blur-[100px]' />
 
-      <div className='max-w-[1400px] mx-auto px-6 lg:px-8 relative'>
+      <div className='max-w-350 mx-auto px-6 lg:px-8 relative'>
         <div className='grid md:grid-cols-4 gap-12 mb-16'>
           {/* Brand */}
           <div className='md:col-span-2'>

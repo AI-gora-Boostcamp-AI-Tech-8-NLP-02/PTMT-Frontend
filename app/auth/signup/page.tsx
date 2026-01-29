@@ -37,7 +37,7 @@ export default function SignupPage() {
 
       try {
         await signup(email, password, name);
-        router.push("/curriculum/history");
+        router.push("/user/history");
       } catch (err) {
         setError(
           err instanceof Error ? err.message : "회원가입에 실패했습니다."
@@ -75,9 +75,6 @@ export default function SignupPage() {
             <h1 className='text-4xl font-black tracking-tight mb-2'>
               회원가입
             </h1>
-            <p className='text-muted-foreground text-lg'>
-              무료로 시작하세요. 카드 등록 필요 없어요.
-            </p>
           </div>
 
           {/* Form */}
