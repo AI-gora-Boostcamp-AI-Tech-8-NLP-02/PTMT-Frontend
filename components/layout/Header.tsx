@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { memo, useCallback } from "react";
 import { Logo } from "./Logo";
@@ -72,14 +71,6 @@ export const Header = memo(function Header({
                 >
                   로그아웃
                 </Button>
-                <Link href='/curriculum/upload-paper'>
-                  <Button className='rounded-xl font-bold bg-primary text-primary-foreground btn-3d px-6'>
-                    <span className='material-symbols-outlined text-lg'>
-                      add
-                    </span>
-                    시작하기
-                  </Button>
-                </Link>
               </>
             ) : (
               // 비로그인 상태

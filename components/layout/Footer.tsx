@@ -1,17 +1,7 @@
 import Link from "next/link";
 import { memo } from "react";
+import { LEGAL_LINKS, SERVICE_LINKS } from "../../const/serviceLinks";
 import { Logo } from "./Logo";
-
-// 6.3 Hoist Static JSX - 정적 데이터
-const SERVICE_LINKS = [
-  { href: "/curriculum/upload-paper", label: "논문 업로드" },
-  { href: "/user/history", label: "내 커리큘럼" },
-] as const;
-
-const LEGAL_LINKS = [
-  { href: "#", label: "이용약관" },
-  { href: "#", label: "개인정보 처리방침" },
-] as const;
 
 // 5.5 Extract to Memoized Components
 export const Footer = memo(function Footer() {
@@ -75,24 +65,6 @@ export const Footer = memo(function Footer() {
           <p className='text-sm text-background/40'>
             © 2024 페튜와 매튜. All rights reserved.
           </p>
-          <div className='flex gap-4'>
-            <a
-              href='#'
-              className='w-10 h-10 rounded-xl bg-background/5 hover:bg-primary/20 flex items-center justify-center transition-colors'
-            >
-              <span className='material-symbols-outlined text-background/60'>
-                mail
-              </span>
-            </a>
-            <a
-              href='#'
-              className='w-10 h-10 rounded-xl bg-background/5 hover:bg-primary/20 flex items-center justify-center transition-colors'
-            >
-              <span className='material-symbols-outlined text-background/60'>
-                code
-              </span>
-            </a>
-          </div>
         </div>
       </div>
     </footer>
