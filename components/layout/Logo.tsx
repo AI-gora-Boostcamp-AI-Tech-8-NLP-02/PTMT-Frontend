@@ -1,7 +1,7 @@
 "use client";
 
-import { memo } from "react";
 import Link from "next/link";
+import { memo } from "react";
 
 interface LogoProps {
   size?: "sm" | "md" | "lg";
@@ -47,8 +47,8 @@ export const Logo = memo(function Logo({
     <Link href='/' className={`flex items-center gap-3 group ${className}`}>
       {/* Logo Icon - 3D effect */}
       <div className={`${sizes.icon} relative`}>
-        <div className='absolute inset-0 bg-gradient-to-br from-primary to-accent rounded-2xl transform rotate-6 opacity-60 group-hover:rotate-12 transition-transform' />
-        <div className='absolute inset-0 bg-gradient-to-br from-primary to-primary/80 rounded-2xl flex items-center justify-center shadow-lg group-hover:-translate-y-0.5 transition-transform'>
+        <div className='absolute inset-0 bg-linear-to-br from-primary to-accent rounded-2xl transform rotate-6 opacity-60 group-hover:rotate-12 transition-transform' />
+        <div className='absolute inset-0 bg-linear-to-br from-primary to-primary/80 rounded-2xl flex items-center justify-center shadow-lg group-hover:-translate-y-0.5 transition-transform'>
           <span
             className={`material-symbols-outlined icon-filled ${sizes.iconText} text-primary-foreground`}
           >
@@ -60,13 +60,14 @@ export const Logo = memo(function Logo({
         <span
           className={`${sizes.title} font-black tracking-tight ${textColor} leading-none`}
         >
-          페튜<span className='text-primary'>와</span>매튜
+          <span className='text-primary'>페튜</span>와
+          <span className='text-accent'>매튜</span>
         </span>
         {showSubtitle && (
           <span
             className={`${sizes.subtitle} font-semibold ${mutedColor} tracking-widest uppercase mt-1`}
           >
-            Paper & Map Tutor
+            Paper Tutor & Map Tutor
           </span>
         )}
       </div>
