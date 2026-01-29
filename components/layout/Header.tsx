@@ -42,10 +42,11 @@ export const Header = memo(function Header({
             ) : isAuthenticated ? (
               // 로그인 상태
               <>
-                <div
-                  className={`hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl ${
-                    variant === "dark" ? "bg-background/10" : "bg-secondary"
+                <Button
+                  className={`hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl hover:bg-accent ${
+                    variant === "dark" ? "bg-background/10" : "bg-background"
                   }`}
+                  onClick={() => router.push("/user/history")}
                 >
                   <div className='size-7 rounded-full bg-primary/20 flex items-center justify-center'>
                     <span className='material-symbols-outlined text-primary text-sm'>
@@ -59,7 +60,7 @@ export const Header = memo(function Header({
                   >
                     {user?.name}
                   </span>
-                </div>
+                </Button>
                 <Button
                   variant='ghost'
                   onClick={handleLogout}
