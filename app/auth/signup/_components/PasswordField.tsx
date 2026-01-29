@@ -53,7 +53,7 @@ export function PasswordField({
             '
           >
             <span className='material-symbols-outlined'>
-              {show ? "visibility" : "visibility_off"}
+              {show ? "visibility_off" : "visibility"}
             </span>
           </button>
         </div>
@@ -85,7 +85,7 @@ export function PasswordField({
             '
           >
             <span className='material-symbols-outlined'>
-              {confirmShow ? "visibility" : "visibility_off"}
+              {confirmShow ? "visibility_off" : "visibility"}
             </span>
           </button>
         </div>

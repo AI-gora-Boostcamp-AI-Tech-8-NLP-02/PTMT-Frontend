@@ -82,7 +82,7 @@ export default function LoginForm({
                rounded-lg hover:bg-slate-100 transition-colors'
               >
                 <span className='material-symbols-outlined text-xl'>
-                  {showPassword ? "visibility" : "visibility_off"}
+                  {showPassword ? "visibility_off" : "visibility"}
                 </span>
               </button>
             </div>
