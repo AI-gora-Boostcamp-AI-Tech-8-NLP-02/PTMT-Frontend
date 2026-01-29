@@ -3,7 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { CurriculumNode } from "@/lib/types";
 import { memo } from "react";
-import { RESOURCE_TYPE_ICONS } from "../../../const/resourceTypeIcons";
+import { RESOURCE_TYPE_ICONS } from "../../../../const/resourceType";
 
 interface GraphSidebarProps {
   selectedNode: CurriculumNode | null;

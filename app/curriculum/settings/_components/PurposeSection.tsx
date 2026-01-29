@@ -1,7 +1,7 @@
 "use client";
 
-import { memo } from "react";
 import { CurriculumPurpose } from "@/lib/types";
+import { memo } from "react";
 
 // 6.3 Hoist Static JSX
 const PURPOSES = [
@@ -22,27 +22,27 @@ export const PurposeSection = memo(function PurposeSection({
   onChange,
 }: PurposeSectionProps) {
   return (
-    <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-200">
-      <div className="flex items-center gap-3 mb-5">
-        <div className="size-10 rounded-2xl bg-red-50 flex items-center justify-center">
-          <span className="material-symbols-outlined text-accent text-xl">
+    <div className='bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-200'>
+      <div className='flex items-center gap-3 mb-5'>
+        <div className='size-10 rounded-2xl bg-red-50 flex items-center justify-center'>
+          <span className='material-symbols-outlined text-accent text-xl'>
             target
           </span>
         </div>
-        <h2 className="text-lg font-bold">1. 학습 목적</h2>
+        <h2 className='text-lg font-bold'>1. 학습 목적</h2>
       </div>
-      <div className="flex flex-wrap gap-3">
+      <div className='flex flex-wrap gap-3'>
         {PURPOSES.map(p => (
-          <label key={p.id} className="cursor-pointer">
+          <label key={p.id} className='cursor-pointer'>
             <input
-              type="radio"
-              name="purpose"
+              type='radio'
+              name='purpose'
               value={p.id}
               checked={value === p.id}
               onChange={e => onChange(e.target.value as CurriculumPurpose)}
-              className="peer sr-only"
+              className='peer sr-only'
             />
-            <div className="px-6 py-3 rounded-full border-2 border-transparent bg-slate-100 text-sm font-bold text-slate-600 transition-all peer-checked:bg-primary peer-checked:text-slate-900 peer-checked:shadow-sm hover:bg-slate-200">
+            <div className='px-6 py-3 rounded-full border-2 border-transparent bg-slate-100 text-sm font-bold text-slate-600 transition-all peer-checked:bg-primary peer-checked:text-slate-900 peer-checked:shadow-sm hover:bg-slate-200 peer-checked:hover:bg-primary/90'>
               {p.label}
             </div>
           </label>

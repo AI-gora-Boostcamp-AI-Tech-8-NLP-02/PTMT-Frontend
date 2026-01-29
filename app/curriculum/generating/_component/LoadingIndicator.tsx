@@ -1,4 +1,4 @@
-import { LOADING_STEPS } from "../../../const/loadingStep";
+import { LOADING_STEPS } from "../../../../const/loadingStep";
 import ProgressRing from "./ProgressRing";
 
 interface LoadingIndicatorProps {

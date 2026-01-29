@@ -59,10 +59,10 @@ export const KnownConceptsSection = memo(function KnownConceptsSection({
                 key={keyId}
                 type='button'
                 onClick={() => toggleConcept(keyId)}
-                className={`px-5 py-2 rounded-full border-2 font-bold text-sm transition-all hover:bg-slate-200 flex items-center gap-1.5 ${
+                className={`px-5 py-2 rounded-full border-2 font-bold text-sm transition-all flex items-center gap-1.5 ${
                   isChecked
-                    ? "border-primary bg-primary/10 text-slate-800"
-                    : "border-transparent bg-slate-100 text-slate-500"
+                    ? "border-primary bg-primary/10 text-slate-800 hover:bg-primary/20"
+                    : "border-transparent bg-slate-100 text-slate-500 hover:bg-slate-200"
                 }`}
               >
                 <span>{kw.name}</span>

@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 
 import { Logo } from "@/components/layout";
 import { useCurriculum } from "@/lib/curriculum-context";
-import { LOADING_STEPS } from "../../const/loadingStep";
+import { LOADING_STEPS } from "../../../const/loadingStep";
 import LoadingIndicator from "./_component/LoadingIndicator";
 import LoadingSteps from "./_component/LoadingSteps";
 import PaperInfoCard from "./_component/PaperInfoCard";

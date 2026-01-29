@@ -2,7 +2,7 @@
 
 import { CurriculumNode } from "@/lib/types";
 import { memo, MouseEvent, useRef, WheelEvent } from "react";
-import { RESOURCE_TYPE_ICONS } from "../../../const/resourceTypeIcons";
+import { RESOURCE_TYPE_ICONS } from "../../../../const/resourceType";
 
 interface NodePosition {
   x: number;

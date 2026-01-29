@@ -1,4 +1,4 @@
-import { CurriculumStatus } from "../../lib/types";
+import { CurriculumStatus } from "../lib/types";
 
 export const STATUS_CONFIG: Record<
   CurriculumStatus,
