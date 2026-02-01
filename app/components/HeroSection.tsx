@@ -62,7 +62,7 @@ export default function HeroSection() {
                 <Button
                   size='lg'
                   className='group flex items-center justify-center gap-2 rounded-lg h-14 px-8 bg-primary text-[#181611] text-base font-bold shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all duration-200 min-w-50'
-                  onClick={() => router.push("/curriculum/upload-paper")}
+                  onClick={() => router.push("/auth/login")}
                 >
                   <span className='material-symbols-outlined text-2xl icon-filled'>
                     rocket_launch
