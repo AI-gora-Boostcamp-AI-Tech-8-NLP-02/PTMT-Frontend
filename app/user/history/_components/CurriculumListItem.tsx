@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { CurriculumListItem } from "@/lib/types";
-import { STATUS_CONFIG } from "../../../../../const/curriculumStatus";
+import { STATUS_CONFIG } from "../../../../const/curriculumStatus";
 
 interface Props {
   item: CurriculumListItem;

@@ -25,7 +25,7 @@ export default function LoginPage() {
 
       try {
         await login(email, password);
-        router.push("/curriculum/history");
+        router.push("/user/history");
       } catch (err) {
         setError(err instanceof Error ? err.message : "로그인에 실패했습니다.");
       } finally {

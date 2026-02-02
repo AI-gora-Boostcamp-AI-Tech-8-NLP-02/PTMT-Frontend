@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useCallback, useMemo, useState } from "react";
 
 import { Logo } from "@/components/layout";
@@ -8,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { useGraphLayout, useZoomPan } from "@/hooks";
 import { dummyCurriculumGraph } from "@/lib/dummy-curriculum";
 import { CurriculumNode } from "@/lib/types";
+import { useRouter } from "next/navigation";
+import { useAuth } from "../../../lib/auth-context";
 import { GraphCanvas } from "./_components/GraphCanvas";
 import { GraphSidebar } from "./_components/GraphSidebar";
 import { MilestoneBar } from "./_components/MilestoneBar";
@@ -27,6 +28,9 @@ import { ZoomControls } from "./_components/ZoomControls";
  * - useZoomPan: 줌/팬 상태 관리
  */
 export default function CurriculumGraphPage() {
+  const router = useRouter();
+  const { user, isAuthenticated, isLoading, logout } = useAuth();
+
   const graph = dummyCurriculumGraph;
 
   // 선택된 노드 상태
@@ -96,18 +100,31 @@ export default function CurriculumGraphPage() {
             <span className='w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse' />
             AI Learning Path Active
           </div>
-          <Link href='/curriculum/history'>
-            <Button
-              variant='outline'
-              size='sm'
-              className='rounded-lg text-xs gap-1.5 h-8'
-            >
-              <span className='material-symbols-outlined text-base'>
-                dashboard
-              </span>
-              Dashboard
-            </Button>
-          </Link>
+          {isAuthenticated ? (
+            <>
+              <Button
+                variant='outline'
+                size='sm'
+                className='rounded-lg text-xs gap-1.5 h-8 hover:bg-primary'
+                onClick={() => router.push("/user/history")}
+              >
+                <span className='material-symbols-outlined text-base'>
+                  dashboard
+                </span>
+                Dashboard
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                variant='ghost'
+                className={`rounded-xl font-semibold`}
+                onClick={() => router.push("/auth/login")}
+              >
+                로그인
+              </Button>
+            </>
+          )}
         </div>
       </header>
 
