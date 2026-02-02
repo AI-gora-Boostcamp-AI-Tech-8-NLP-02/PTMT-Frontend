@@ -11,9 +11,7 @@ type Props = {
 };
 
 export function CurriculumNodeView({ data, selected }: Props) {
-  const { keyword, keyword_importance, resources } = data.curriculum;
-
-  const isImportant = keyword_importance >= 7;
+  const { keyword, resources, is_keyword_necessary } = data.curriculum;
 
   return (
     <div className='relative'>
@@ -28,7 +26,7 @@ export function CurriculumNodeView({ data, selected }: Props) {
         ${
           selected
             ? "border-accent border-6 shadow-lg scale-105 z-10"
-            : isImportant
+            : is_keyword_necessary
               ? "border-primary border-5"
               : "border-slate-100 hover:border-slate-300 hover:shadow-lg"
         }
@@ -52,7 +50,7 @@ export function CurriculumNodeView({ data, selected }: Props) {
               <span
                 key={idx}
                 className={`material-symbols-outlined text-4xl transition-colors ${
-                  isImportant ? "text-amber-500" : "text-slate-400"
+                  is_keyword_necessary ? "text-amber-500" : "text-slate-400"
                 }`}
                 title={res.type} // hover 시 타입 보여주기
               >

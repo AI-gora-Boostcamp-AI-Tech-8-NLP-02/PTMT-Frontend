@@ -12,80 +12,99 @@ interface GraphLayoutResult {
 }
 
 /**
- * 그래프 노드들의 레이아웃 위치를 계산하는 훅
- * Topological Order를 기반으로 왼쪽에서 오른쪽으로 배치
+ * edge 정보 기반으로 노드 레이어를 계산하고
+ * 좌표를 배치하는 훅
  */
 export function useGraphLayout(
   nodes: CurriculumNode[],
-  edges: CurriculumEdge[]
+  edges: CurriculumEdge[],
+  startNodeId: string // layer1 기준 노드
 ): GraphLayoutResult {
   return useMemo(() => {
-    const outgoing: Record<string, string[]> = {};
-    const incoming: Record<string, string[]> = {};
-
-    nodes.forEach(node => {
-      outgoing[node.keyword_id] = [];
-      incoming[node.keyword_id] = [];
+    // 1️⃣ Adjacency List (Undirected for BFS from startNodeId)
+    // startNodeId를 기준으로 퍼져나가는 형태를 만들기 위해 무방향 그래프로 간주하고 탐색합니다.
+    const adjacency: Record<string, string[]> = {};
+    nodes.forEach(n => {
+      adjacency[n.keyword_id] = [];
     });
 
-    edges.forEach(edge => {
-      if (outgoing[edge.start] && incoming[edge.end]) {
-        outgoing[edge.start].push(edge.end);
-        incoming[edge.start].push(edge.end);
+    edges.forEach(e => {
+      if (adjacency[e.start] && adjacency[e.end]) {
+        adjacency[e.start].push(e.end);
+        adjacency[e.end].push(e.start);
       }
     });
 
-    // Topological layers
+    // 2️⃣ BFS Layering
     const layers: string[][] = [];
-    const assigned = new Set<string>();
-    const remaining = new Set(nodes.map(n => n.keyword_id));
+    const visited = new Set<string>();
+    const queue: { id: string; depth: number }[] = [];
 
-    while (remaining.size > 0) {
-      const currentLayer: string[] = [];
-      remaining.forEach(nodeId => {
-        const hasUnassignedIncoming = incoming[nodeId].some(
-          p => !assigned.has(p)
-        );
-        if (!hasUnassignedIncoming) currentLayer.push(nodeId);
-      });
+    // Start node handling
+    const startNode = nodes.find(n => n.keyword_id === startNodeId) || nodes[0];
 
-      if (currentLayer.length === 0) {
-        currentLayer.push([...remaining][0]);
-      }
+    if (startNode) {
+      queue.push({ id: startNode.keyword_id, depth: 0 });
+      visited.add(startNode.keyword_id);
+    }
 
-      layers.push(currentLayer);
-      currentLayer.forEach(nodeId => {
-        assigned.add(nodeId);
-        remaining.delete(nodeId);
+    while (queue.length > 0) {
+      const { id, depth } = queue.shift()!;
+
+      if (!layers[depth]) layers[depth] = [];
+      layers[depth].push(id);
+
+      const neighbors = adjacency[id] || [];
+      neighbors.forEach(nextId => {
+        if (!visited.has(nextId)) {
+          visited.add(nextId);
+          queue.push({ id: nextId, depth: depth + 1 });
+        }
       });
     }
 
-    // Flatten logic for topological order
-    const sortedNodeIds = layers.flat();
+    // Handle disconnected nodes (if any)
+    const unvisited = nodes.filter(n => !visited.has(n.keyword_id));
+    if (unvisited.length > 0) {
+      const nextLayer = layers.length;
+      layers[nextLayer] = unvisited.map(n => n.keyword_id);
+    }
 
-    // Dimensions
+    // 3️⃣ Position Calculation (Gap based)
     const height = 600;
-    const paddingX = 120;
-    const paddingY = 100;
-    const xGap = 300;
+    const paddingX = 50;
+    const paddingY = 50;
+    const xGap = 400; // 가로 간격
+    const yGap = 250; // 세로 간격
 
     const positions: Record<string, NodePosition> = {};
 
+    // 전체 그래프의 높이를 계산하여 수직 중앙 정렬
+    const maxNodesInLayer = Math.max(...layers.map(l => l.length));
+    const totalHeight = maxNodesInLayer * yGap;
+
     layers.forEach((layer, layerIdx) => {
-      const x = paddingX + layerIdx * xGap;
+      const x = paddingX + (layers.length - 1 - layerIdx) * xGap;
+      const layerHeight = layer.length * yGap;
+      // 해당 레이어를 전체 높이 기준 중앙에 배치
+      const startY = paddingY + (totalHeight - layerHeight) / 2;
 
       layer.forEach((nodeId, nodeIdx) => {
-        const y =
-          layer.length === 1
-            ? height / 2
-            : paddingY +
-              ((height - paddingY * 2) * nodeIdx) /
-                Math.max(layer.length - 1, 1);
+        // const y =
+        //   layer.length === 1
+        //     ? height / 2
+        //     : paddingY +
+        //       ((height - paddingY * 2) * nodeIdx) /
+        //         Math.max(layer.length - 1, 1);
+        const y = startY + nodeIdx * yGap;
 
         positions[nodeId] = { x, y };
       });
     });
 
+    // 4️⃣ Flatten for sorted IDs
+    const sortedNodeIds = layers.flat();
+
     return { positions, sortedNodeIds };
-  }, [nodes, edges]);
+  }, [nodes, edges, startNodeId]);
 }
