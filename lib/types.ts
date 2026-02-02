@@ -123,10 +123,10 @@ export interface Resource {
   url?: string;
   type: ResourceType;
   resource_description: string;
-  difficulty: number;
-  importance: number;
-  study_load: number;
-  is_necessary: boolean;
+  difficulty?: number;
+  importance?: number;
+  study_load?: number;
+  is_necessary?: boolean;
 }
 
 export interface CurriculumNode {
