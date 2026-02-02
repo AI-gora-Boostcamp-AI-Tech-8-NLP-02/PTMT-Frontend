@@ -156,6 +156,7 @@ export interface CurriculumGraphMeta {
 
 export interface CurriculumGraph {
   meta: CurriculumGraphMeta;
+  first_node_order: string[];
   nodes: CurriculumNode[];
   edges: CurriculumEdge[];
 }

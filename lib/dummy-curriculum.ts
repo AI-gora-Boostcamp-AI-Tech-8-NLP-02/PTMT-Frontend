@@ -11,6 +11,11 @@ export const dummyCurriculumGraph: CurriculumGraph = {
     total_study_time_hours: 24,
     total_nodes: 16,
   },
+  first_node_order: [
+    "node-linear-algebra",
+    "node-seq2seq",
+    "node-positional-encoding",
+  ],
   nodes: [
     // Layer 1 - Foundations
     {
@@ -371,29 +376,105 @@ export const dummyCurriculumGraph: CurriculumGraph = {
   ],
   edges: [
     // Foundations
-    { from_keyword_id: "node-linear-algebra", to_keyword_id: "node-neural-network", relationship: "prerequisite" },
-    { from_keyword_id: "node-neural-network", to_keyword_id: "node-rnn", relationship: "prerequisite" },
-    { from_keyword_id: "node-neural-network", to_keyword_id: "node-word-embedding", relationship: "prerequisite" },
+    {
+      from_keyword_id: "node-linear-algebra",
+      to_keyword_id: "node-neural-network",
+      relationship: "prerequisite",
+    },
+    {
+      from_keyword_id: "node-neural-network",
+      to_keyword_id: "node-rnn",
+      relationship: "prerequisite",
+    },
+    {
+      from_keyword_id: "node-neural-network",
+      to_keyword_id: "node-word-embedding",
+      relationship: "prerequisite",
+    },
     // RNN path
-    { from_keyword_id: "node-rnn", to_keyword_id: "node-lstm", relationship: "prerequisite" },
-    { from_keyword_id: "node-lstm", to_keyword_id: "node-seq2seq", relationship: "prerequisite" },
-    { from_keyword_id: "node-word-embedding", to_keyword_id: "node-seq2seq", relationship: "prerequisite" },
+    {
+      from_keyword_id: "node-rnn",
+      to_keyword_id: "node-lstm",
+      relationship: "prerequisite",
+    },
+    {
+      from_keyword_id: "node-lstm",
+      to_keyword_id: "node-seq2seq",
+      relationship: "prerequisite",
+    },
+    {
+      from_keyword_id: "node-word-embedding",
+      to_keyword_id: "node-seq2seq",
+      relationship: "prerequisite",
+    },
     // Attention path
-    { from_keyword_id: "node-seq2seq", to_keyword_id: "node-attention", relationship: "prerequisite" },
-    { from_keyword_id: "node-seq2seq", to_keyword_id: "node-encoder-decoder", relationship: "prerequisite" },
-    { from_keyword_id: "node-attention", to_keyword_id: "node-self-attention", relationship: "prerequisite" },
-    { from_keyword_id: "node-encoder-decoder", to_keyword_id: "node-self-attention", relationship: "related" },
+    {
+      from_keyword_id: "node-seq2seq",
+      to_keyword_id: "node-attention",
+      relationship: "prerequisite",
+    },
+    {
+      from_keyword_id: "node-seq2seq",
+      to_keyword_id: "node-encoder-decoder",
+      relationship: "prerequisite",
+    },
+    {
+      from_keyword_id: "node-attention",
+      to_keyword_id: "node-self-attention",
+      relationship: "prerequisite",
+    },
+    {
+      from_keyword_id: "node-encoder-decoder",
+      to_keyword_id: "node-self-attention",
+      relationship: "related",
+    },
     // Self-Attention components
-    { from_keyword_id: "node-self-attention", to_keyword_id: "node-scaled-dot", relationship: "prerequisite" },
-    { from_keyword_id: "node-scaled-dot", to_keyword_id: "node-multi-head", relationship: "prerequisite" },
-    { from_keyword_id: "node-self-attention", to_keyword_id: "node-positional", relationship: "related" },
+    {
+      from_keyword_id: "node-self-attention",
+      to_keyword_id: "node-scaled-dot",
+      relationship: "prerequisite",
+    },
+    {
+      from_keyword_id: "node-scaled-dot",
+      to_keyword_id: "node-multi-head",
+      relationship: "prerequisite",
+    },
+    {
+      from_keyword_id: "node-self-attention",
+      to_keyword_id: "node-positional",
+      relationship: "related",
+    },
     // Transformer components
-    { from_keyword_id: "node-multi-head", to_keyword_id: "node-ffn", relationship: "prerequisite" },
-    { from_keyword_id: "node-multi-head", to_keyword_id: "node-layer-norm", relationship: "prerequisite" },
-    { from_keyword_id: "node-ffn", to_keyword_id: "node-transformer", relationship: "prerequisite" },
-    { from_keyword_id: "node-layer-norm", to_keyword_id: "node-transformer", relationship: "prerequisite" },
-    { from_keyword_id: "node-positional", to_keyword_id: "node-transformer", relationship: "prerequisite" },
+    {
+      from_keyword_id: "node-multi-head",
+      to_keyword_id: "node-ffn",
+      relationship: "prerequisite",
+    },
+    {
+      from_keyword_id: "node-multi-head",
+      to_keyword_id: "node-layer-norm",
+      relationship: "prerequisite",
+    },
+    {
+      from_keyword_id: "node-ffn",
+      to_keyword_id: "node-transformer",
+      relationship: "prerequisite",
+    },
+    {
+      from_keyword_id: "node-layer-norm",
+      to_keyword_id: "node-transformer",
+      relationship: "prerequisite",
+    },
+    {
+      from_keyword_id: "node-positional",
+      to_keyword_id: "node-transformer",
+      relationship: "prerequisite",
+    },
     // Extensions
-    { from_keyword_id: "node-transformer", to_keyword_id: "node-bert", relationship: "prerequisite" },
+    {
+      from_keyword_id: "node-transformer",
+      to_keyword_id: "node-bert",
+      relationship: "prerequisite",
+    },
   ],
 };
