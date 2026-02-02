@@ -1,4 +1,4 @@
-import { dummyCurriculumGraph } from "./dummy-curriculum";
+import { dummyCurriculumGraph } from "./dummy-curriculum-2";
 import {
   AuthResponse,
   Curriculum,
@@ -508,7 +508,7 @@ export const curriculumApi = {
         purpose: "deep_research",
         level: "master",
         budgeted_time: { days: 14, daily_hours: 2 },
-        preferred_resources: ["paper", "article"],
+        preferred_resources: ["paper", "web_doc"],
         paper: {
           id: "paper-1",
           title: "Attention Is All You Need",

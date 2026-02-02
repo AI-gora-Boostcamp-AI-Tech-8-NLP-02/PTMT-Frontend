@@ -129,7 +129,7 @@ export const GraphCanvas = memo(function GraphCanvas({
             const pos = nodePositions[node.keyword_id];
             if (!pos) return null;
             const isSelected = selectedNodeId === node.keyword_id;
-            const isImportant = node.importance >= 7;
+            const isImportant = node.keyword_importance >= 7;
 
             return (
               <g

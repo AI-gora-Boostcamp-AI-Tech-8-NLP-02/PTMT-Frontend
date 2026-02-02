@@ -11,9 +11,9 @@ type Props = {
 };
 
 export function CurriculumNodeView({ data, selected }: Props) {
-  const { keyword, importance, resources } = data.curriculum;
+  const { keyword, keyword_importance, resources } = data.curriculum;
 
-  const isImportant = importance >= 7;
+  const isImportant = keyword_importance >= 7;
 
   return (
     <div className='relative'>

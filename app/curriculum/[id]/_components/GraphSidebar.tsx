@@ -100,14 +100,14 @@ export const GraphSidebar = memo(function GraphSidebar({
                         <span className='text-[10px] font-bold text-slate-400 uppercase tracking-wider'>
                           {resource.type}
                         </span>
-                        {resource.is_core && (
+                        {resource.is_necessary && (
                           <span className='text-[9px] font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded'>
                             CORE
                           </span>
                         )}
                       </div>
                       <h4 className='text-sm font-bold text-slate-800 leading-snug'>
-                        {resource.name}
+                        {resource.resource_name}
                       </h4>
                     </div>
                   </div>
@@ -132,7 +132,7 @@ export const GraphSidebar = memo(function GraphSidebar({
                     </div>
                     <div className='text-center border-l border-slate-200'>
                       <div className='text-xs font-bold text-slate-700'>
-                        {resource.study_load_minutes}m
+                        {resource.study_load}h
                       </div>
                       <div className='text-[9px] text-slate-400 uppercase'>
                         Time
@@ -159,7 +159,7 @@ export const GraphSidebar = memo(function GraphSidebar({
           </div>
 
           {/* 3. Foundational Context (Bottom) */}
-          {selectedNode.resources[0]?.is_core && (
+          {selectedNode.resources[0]?.is_necessary && (
             <div className='mt-8 pt-6 border-t border-slate-100'>
               <div className='bg-slate-900 rounded-xl p-5 text-white'>
                 <div className='flex items-center gap-2 mb-3'>

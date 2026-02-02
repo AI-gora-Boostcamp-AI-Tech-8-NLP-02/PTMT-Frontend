@@ -1,4 +1,4 @@
-import { CurriculumNode } from "@/lib/types";
+import { CurriculumEdge, CurriculumNode } from "@/lib/types";
 import { useMemo } from "react";
 
 interface NodePosition {
@@ -17,7 +17,7 @@ interface GraphLayoutResult {
  */
 export function useGraphLayout(
   nodes: CurriculumNode[],
-  edges: { from_keyword_id: string; to_keyword_id: string }[]
+  edges: CurriculumEdge[]
 ): GraphLayoutResult {
   return useMemo(() => {
     const outgoing: Record<string, string[]> = {};
@@ -29,9 +29,9 @@ export function useGraphLayout(
     });
 
     edges.forEach(edge => {
-      if (outgoing[edge.from_keyword_id] && incoming[edge.to_keyword_id]) {
-        outgoing[edge.from_keyword_id].push(edge.to_keyword_id);
-        incoming[edge.to_keyword_id].push(edge.from_keyword_id);
+      if (outgoing[edge.start] && incoming[edge.end]) {
+        outgoing[edge.start].push(edge.end);
+        incoming[edge.start].push(edge.end);
       }
     });
 

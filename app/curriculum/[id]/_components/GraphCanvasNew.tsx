@@ -10,7 +10,7 @@ import {
 } from "@xyflow/react";
 
 import { MouseEvent, useEffect, WheelEvent } from "react";
-import { CurriculumNode } from "../../../../lib/types";
+import { CurriculumEdge, CurriculumNode } from "../../../../lib/types";
 import CurriculumNodeView from "./GraphNodeView";
 
 interface NodePosition {
@@ -20,7 +20,7 @@ interface NodePosition {
 
 interface GraphCanvasProps {
   nodes: CurriculumNode[];
-  edges: { from_keyword_id: string; to_keyword_id: string }[];
+  edges: CurriculumEdge[];
   nodePositions: Record<string, NodePosition>;
   selectedNodeId: string | null;
   viewBox: string;
@@ -55,9 +55,9 @@ export default function GraphCanvas(props: GraphCanvasProps) {
     }));
 
     const mappedEdges = props.edges.map((edge, index) => ({
-      id: `e-${edge.from_keyword_id}-${edge.to_keyword_id}`, // 🔑 유니크
-      source: edge.from_keyword_id,
-      target: edge.to_keyword_id,
+      id: `e-${edge.start}-${edge.end}`, // 🔑 유니크
+      source: edge.start,
+      target: edge.end,
       type: "default", // or "default", "step", "bezier"
       animated: false,
     }));

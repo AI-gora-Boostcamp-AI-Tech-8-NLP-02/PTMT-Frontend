@@ -6,7 +6,7 @@ import { useCallback, useMemo, useState } from "react";
 import { Logo } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { useGraphLayout, useZoomPan } from "@/hooks";
-import { dummyCurriculumGraph } from "@/lib/dummy-curriculum";
+import { dummyCurriculumGraph } from "@/lib/dummy-curriculum-2";
 import { CurriculumNode } from "@/lib/types";
 import GraphCanvasNew from "./_components/GraphCanvasNew";
 import { GraphSidebar } from "./_components/GraphSidebar";
@@ -60,7 +60,7 @@ export default function CurriculumGraphPage() {
   const importantNodes = useMemo(() => {
     const orderMap = new Map(sortedNodeIds.map((id, index) => [id, index]));
     return graph.nodes
-      .filter(n => n.importance >= 7)
+      .filter(n => n.keyword_importance >= 7)
       .sort((a, b) => {
         const orderA = orderMap.get(a.keyword_id) ?? 999;
         const orderB = orderMap.get(b.keyword_id) ?? 999;
