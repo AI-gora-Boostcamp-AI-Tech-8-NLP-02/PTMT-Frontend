@@ -123,8 +123,8 @@ export function useGraphLayout(
     const NODE_HEIGHT = 320;
 
     // 레이어 간 간격 및 랜덤 범위
-    const LAYER_X_GAP = 500;
-    const LAYER_X_JITTER = 200; // 레이어 중심 기준 좌우 랜덤 범위
+    const LAYER_X_GAP = 600;
+    const LAYER_X_JITTER = 1000; // 레이어 중심 기준 좌우 랜덤 범위
 
     const CANVAS_CENTER_Y = 400;
 
@@ -149,8 +149,7 @@ export function useGraphLayout(
     finalLayers.forEach((layer, layerIdx) => {
       // 레이어 내 노드 수에 따라 Y축 분산 범위 동적 계산
       const nodeCount = layer.length;
-      // 노드가 많을수록 더 넓은 공간 필요. 최소 1000px 확보.
-      const ySpread = Math.max(1000, nodeCount * NODE_HEIGHT * 1.5);
+      const ySpread = Math.max(1000, nodeCount * NODE_HEIGHT * 1.75);
 
       const layerBaseX = layerIdx * LAYER_X_GAP + 100;
 
