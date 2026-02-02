@@ -97,6 +97,7 @@ export default function GraphCanvas(props: GraphCanvasProps) {
         }
         nodeTypes={nodeTypes}
         attributionPosition='bottom-left'
+        minZoom={0.01}
       >
         <Controls />
         <FitViewOnLoad nodes={rfnodes} />
