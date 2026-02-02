@@ -79,7 +79,7 @@ export default function GraphCanvas(props: GraphCanvasProps) {
       id: `e-${edge.from_keyword_id}-${edge.to_keyword_id}`, // 🔑 유니크
       source: edge.from_keyword_id,
       target: edge.to_keyword_id,
-      type: "smoothstep", // or "default", "step", "bezier"
+      type: "default", // or "default", "step", "bezier"
       animated: false,
     }));
 

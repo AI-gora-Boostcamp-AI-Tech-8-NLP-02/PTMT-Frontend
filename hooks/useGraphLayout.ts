@@ -64,17 +64,15 @@ export function useGraphLayout(
     const sortedNodeIds = layers.flat();
 
     // Dimensions
-    const width = 1200;
     const height = 600;
     const paddingX = 120;
     const paddingY = 100;
+    const xGap = 300;
 
     const positions: Record<string, NodePosition> = {};
 
     layers.forEach((layer, layerIdx) => {
-      const x =
-        paddingX +
-        ((width - paddingX * 2) * layerIdx) / Math.max(layers.length - 1, 1);
+      const x = paddingX + layerIdx * xGap;
 
       layer.forEach((nodeId, nodeIdx) => {
         const y =
