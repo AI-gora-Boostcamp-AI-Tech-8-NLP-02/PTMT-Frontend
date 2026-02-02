@@ -17,7 +17,7 @@ export function CurriculumNodeView({ data, selected }: Props) {
     <div className='relative'>
       {/* 바깥쪽 점선 */}
       {selected && (
-        <div className='absolute -inset-2 rounded-2xl border-2 border-dashed border-accent animate-dash pointer-events-none z-0 scale-105' />
+        <div className='absolute -inset-2 rounded-2xl border-2 border-dashed border-blue-700 animate-dash pointer-events-none z-0 scale-105' />
       )}
       <div
         className={`
@@ -25,9 +25,9 @@ export function CurriculumNodeView({ data, selected }: Props) {
         shadow-md transition-all duration-300 flex flex-col items-center justify-center text-center
         ${
           selected
-            ? "border-accent border-6 shadow-lg scale-105 z-10"
+            ? "border-blue-700 border-6 shadow-lg scale-105 z-10"
             : is_keyword_necessary
-              ? "border-primary border-5"
+              ? "border-accent border-5"
               : "border-slate-100 hover:border-slate-300 hover:shadow-lg"
         }
       `}
@@ -50,7 +50,7 @@ export function CurriculumNodeView({ data, selected }: Props) {
               <span
                 key={idx}
                 className={`material-symbols-outlined text-4xl transition-colors ${
-                  is_keyword_necessary ? "text-amber-500" : "text-slate-400"
+                  res.is_necessary ? "text-accent" : "text-slate-400"
                 }`}
                 title={res.type} // hover 시 타입 보여주기
               >
