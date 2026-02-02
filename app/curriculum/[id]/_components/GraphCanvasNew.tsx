@@ -3,6 +3,7 @@
 import type { Edge, Node } from "@xyflow/react";
 import {
   Controls,
+  MarkerType,
   ReactFlow,
   useEdgesState,
   useNodesState,
@@ -60,6 +61,12 @@ export default function GraphCanvas(props: GraphCanvasProps) {
       target: edge.end,
       type: "default", // or "default", "step", "bezier"
       animated: false,
+      markerEnd: {
+        type: MarkerType.ArrowClosed,
+        width: 16,
+        height: 16,
+        color: "oklch(70.4% 0.04 256.788)",
+      },
     }));
 
     setNodes(mappedNodes);

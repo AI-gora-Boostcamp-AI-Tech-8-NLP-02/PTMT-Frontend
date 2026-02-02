@@ -68,8 +68,8 @@
 }
 
 .react-flow__edge-path {
-  stroke: #00bcd4; /* 색상 */
-  stroke-width: 2px; /* 두께 */
+  stroke: var(--color-slate-400); /* 색상 */
+  stroke-width: 4px; /* 두께 */
   stroke-linecap: round; /* 끝 모양 */
 }
 

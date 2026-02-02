@@ -39,7 +39,7 @@ export default function CurriculumGraphPage() {
   const { positions: nodePositions, sortedNodeIds } = useGraphLayout(
     graph.nodes,
     graph.edges,
-    graph.meta.paper_id
+    graph.first_node_order
   );
 
   // 줌/팬 상태 (커스텀 훅)

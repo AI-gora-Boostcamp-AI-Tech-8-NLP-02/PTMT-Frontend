@@ -18,7 +18,7 @@ interface GraphLayoutResult {
 export function useGraphLayout(
   nodes: CurriculumNode[],
   edges: CurriculumEdge[],
-  startNodeId: string // layer1 기준 노드
+  startNodeIds: string[] // layer1 기준 노드
 ): GraphLayoutResult {
   return useMemo(() => {
     // 1️⃣ Adjacency List (Undirected for BFS from startNodeId)
@@ -41,9 +41,15 @@ export function useGraphLayout(
     const queue: { id: string; depth: number }[] = [];
 
     // Start node handling
-    const startNode = nodes.find(n => n.keyword_id === startNodeId) || nodes[0];
+    const startNodes = nodes.filter(n => startNodeIds.includes(n.keyword_id));
 
-    if (startNode) {
+    if (startNodes.length > 0) {
+      startNodes.forEach(n => {
+        queue.push({ id: n.keyword_id, depth: 0 });
+        visited.add(n.keyword_id);
+      });
+    } else if (nodes.length > 0) {
+      const startNode = nodes[0];
       queue.push({ id: startNode.keyword_id, depth: 0 });
       visited.add(startNode.keyword_id);
     }
@@ -74,8 +80,8 @@ export function useGraphLayout(
     const height = 600;
     const paddingX = 50;
     const paddingY = 50;
-    const xGap = 400; // 가로 간격
-    const yGap = 250; // 세로 간격
+    const xGap = 600; // 가로 간격
+    const yGap = 300; // 세로 간격
 
     const positions: Record<string, NodePosition> = {};
 
@@ -84,7 +90,7 @@ export function useGraphLayout(
     const totalHeight = maxNodesInLayer * yGap;
 
     layers.forEach((layer, layerIdx) => {
-      const x = paddingX + (layers.length - 1 - layerIdx) * xGap;
+      const x = paddingX + layerIdx * xGap;
       const layerHeight = layer.length * yGap;
       // 해당 레이어를 전체 높이 기준 중앙에 배치
       const startY = paddingY + (totalHeight - layerHeight) / 2;
@@ -106,5 +112,5 @@ export function useGraphLayout(
     const sortedNodeIds = layers.flat();
 
     return { positions, sortedNodeIds };
-  }, [nodes, edges, startNodeId]);
+  }, [nodes, edges, startNodeIds]);
 }
