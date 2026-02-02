@@ -121,13 +121,6 @@ export default function CurriculumGraphPage() {
 
         {/* Graph Area */}
         <section className='flex-1 flex flex-col bg-[#f8fafc]'>
-          {/* Zoom Controls */}
-          {/* <ZoomControls
-            onZoomIn={zoomIn}
-            onZoomOut={zoomOut}
-            onReset={resetView}
-          /> */}
-
           {/* SVG Graph Canvas */}
           <GraphCanvasNew
             nodes={graph.nodes}
