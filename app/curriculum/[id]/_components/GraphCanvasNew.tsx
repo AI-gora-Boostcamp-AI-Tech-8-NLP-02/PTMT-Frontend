@@ -13,6 +13,7 @@ import {
 import { MouseEvent, useEffect, WheelEvent } from "react";
 import { CurriculumEdge, CurriculumNode } from "../../../../lib/types";
 import CurriculumNodeView from "./GraphNodeView";
+import { PaperNodeView } from "./PaperNodeView";
 
 interface NodePosition {
   x: number;
@@ -22,6 +23,7 @@ interface NodePosition {
 interface GraphCanvasProps {
   nodes: CurriculumNode[];
   edges: CurriculumEdge[];
+  paperId: string;
   nodePositions: Record<string, NodePosition>;
   selectedNodeId: string | null;
   viewBox: string;
@@ -35,6 +37,7 @@ interface GraphCanvasProps {
 
 const nodeTypes = {
   curriculum: CurriculumNodeView,
+  paper: PaperNodeView,
 };
 
 export default function GraphCanvas(props: GraphCanvasProps) {
@@ -46,7 +49,7 @@ export default function GraphCanvas(props: GraphCanvasProps) {
 
     const mappedNodes = props.nodes.map((node, index) => ({
       id: node.keyword_id,
-      type: "curriculum", // or "input", "output", custom node
+      type: node.keyword_id === props.paperId ? "paper" : "curriculum", // or "input", "output", custom node
       position: props.nodePositions[node.keyword_id],
       data: {
         label: node.keyword,

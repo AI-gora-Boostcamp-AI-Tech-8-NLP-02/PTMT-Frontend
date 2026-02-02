@@ -131,6 +131,7 @@ export default function CurriculumGraphPage() {
           <GraphCanvasNew
             nodes={graph.nodes}
             edges={graph.edges}
+            paperId={graph.meta.paper_id}
             nodePositions={nodePositions}
             selectedNodeId={selectedNode?.keyword_id ?? null}
             viewBox={viewBox}
