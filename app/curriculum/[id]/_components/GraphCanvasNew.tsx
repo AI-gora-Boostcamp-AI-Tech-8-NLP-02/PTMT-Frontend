@@ -8,7 +8,6 @@ import {
   useNodesState,
   useReactFlow,
 } from "@xyflow/react";
-import "@xyflow/react/dist/style.css";
 
 import { MouseEvent, useEffect, WheelEvent } from "react";
 import { CurriculumNode } from "../../../../lib/types";
@@ -37,25 +36,6 @@ const nodeTypes = {
   curriculum: CurriculumNodeView,
 };
 
-// const initialNodes = [
-//   {
-//     id: "1",
-//     position: { x: 0, y: 0 },
-//     type: "default",
-//     data: { label: "Node 1" },
-//   },
-//   {
-//     id: "2",
-//     position: { x: 0, y: 100 },
-//     type: "default",
-//     data: { label: "Node 2" },
-//   },
-// ];
-
-// const initialEdges = [
-//   { id: "e1-2", source: "1", target: "2", animated: true, type: "smoothstep" },
-// ];
-
 export default function GraphCanvas(props: GraphCanvasProps) {
   const [rfnodes, setNodes, onNodesChange] = useNodesState<Node>([]);
   const [rfedges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
@@ -72,7 +52,6 @@ export default function GraphCanvas(props: GraphCanvasProps) {
         label: node.keyword,
         curriculum: node, // 👈 CurriculumNode 통째로 넣기
       },
-      style: { width: 140, height: 80 },
     }));
 
     const mappedEdges = props.edges.map((edge, index) => ({

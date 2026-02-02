@@ -1,4 +1,5 @@
 /* xyflow theme files. Delete these to start from our base */
+@import url("@xyflow/react/dist/style.css");
 
 .react-flow {
   --xy-background-color: #f7f9fb;
@@ -32,31 +33,34 @@
 }
 
 /* Customizing Default Theming */
+.react-flow__edges {
+  position: absolute;
+}
 
 .react-flow__node {
   display: inline-block;
-  width: 140px;
-  height: 80px;
+  width: fit-content;
+  height: auto;
 }
 
-.react-flow__node.selectable:focus {
+/* .react-flow__node.selectable:focus {
   box-shadow: 0px 0px 0px 4px var(--xy-theme-color-focus);
   border-color: #d9d9d9;
-}
+} */
 
-.react-flow__node.selectable:focus:active {
+/* .react-flow__node.selectable:focus:active {
   box-shadow: var(--xy-node-boxshadow-default);
-}
+} */
 
 .react-flow__node.selectable:hover,
 .react-flow__node.draggable:hover {
   border-color: var(--xy-theme-hover);
 }
 
-.react-flow__node.selectable.selected {
+/* .react-flow__node.selectable.selected {
   border-color: var(--xy-theme-selected);
   box-shadow: var(--xy-node-boxshadow-default);
-}
+} */
 
 .react-flow__node-group {
   background-color: rgba(207, 182, 255, 0.4);

@@ -1,6 +1,7 @@
 import type { CurriculumNode } from "@/lib/types";
 import { Handle, Position } from "@xyflow/react";
 import { memo } from "react";
+import { RESOURCE_TYPE_ICONS } from "../../../../const/resourceType";
 
 type Props = {
   data: {
@@ -10,62 +11,64 @@ type Props = {
 };
 
 export function CurriculumNodeView({ data, selected }: Props) {
-  const { keyword, description, importance } = data.curriculum;
+  const { keyword, importance, resources } = data.curriculum;
 
-  const importanceColor =
-    importance >= 7
-      ? "bg-amber-100 text-amber-700"
-      : "bg-slate-100 text-slate-600";
+  const isImportant = importance >= 7;
 
   return (
-    <div
-      className={`
-        relative w-35 min-h-15 rounded-lg border bg-white px-3 py-2
-        shadow-sm transition-all
+    <div className='relative'>
+      {/* 바깥쪽 점선 */}
+      {selected && (
+        <div className='absolute -inset-2 rounded-2xl border-2 border-dashed border-accent animate-dash pointer-events-none z-0 scale-105' />
+      )}
+      <div
+        className={`
+        relative min-w-65 rounded-2xl border bg-white p-5
+        shadow-md transition-all duration-300 flex flex-col items-center justify-center text-center
         ${
           selected
-            ? "border-blue-500 ring-2 ring-blue-200 scale-[1.02]"
-            : "border-slate-200 hover:shadow"
+            ? "border-accent border-6 shadow-lg scale-105 z-10"
+            : isImportant
+              ? "border-primary border-5"
+              : "border-slate-100 hover:border-slate-300 hover:shadow-lg"
         }
       `}
-    >
-      {/* 왼쪽 handle */}
-      <Handle
-        type='target'
-        position={Position.Left}
-        className='absolute top-1/2 left-0 -translate-y-1/2 w-3 h-3 bg-teal-500 rounded-full'
-      />
+      >
+        {/* 왼쪽 handle */}
+        <Handle
+          type='target'
+          position={Position.Left}
+          className='absolute top-1/2 left-0 -translate-y-1/2 w-3 h-3 bg-teal-500 rounded-full opacity-0'
+        />
 
-      <div>
-        {/* title */}
-        <h3 className='text-[12px] font-semibold text-slate-800 leading-tight line-clamp-2'>
-          {keyword}
-        </h3>
+        <div>
+          {/* title */}
+          <h3 className='text-xl font-bold text-slate-800 leading-snug mb-3 line-clamp-2'>
+            {keyword}
+          </h3>
 
-        {/* description */}
-        {description && (
-          <p className='mt-1 text-[11px] text-slate-600 leading-snug line-clamp-2'>
-            {description}
-          </p>
-        )}
-
-        {/* footer */}
-        <div className='mt-1.5 flex justify-between items-center'>
-          <span
-            className={`text-[10px] px-1.5 py-0.5 rounded ${importanceColor}`}
-          >
-            ★ {importance}
-          </span>
-          <span className='text-[9px] text-slate-400'>node</span>
+          <div className='flex items-center justify-center w-full gap-3 mt-1'>
+            {resources.map((res, idx) => (
+              <span
+                key={idx}
+                className={`material-symbols-outlined text-4xl transition-colors ${
+                  isImportant ? "text-amber-500" : "text-slate-400"
+                }`}
+                title={res.type} // hover 시 타입 보여주기
+              >
+                {RESOURCE_TYPE_ICONS[res.type] || "psychology"}
+              </span>
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* 오른쪽 handle */}
-      <Handle
-        type='source'
-        position={Position.Right}
-        className='absolute top-1/2 right-0 -translate-y-1/2 w-3 h-3 bg-teal-500 rounded-full'
-      />
+        {/* 오른쪽 handle */}
+        <Handle
+          type='source'
+          position={Position.Right}
+          className='absolute top-1/2 right-0 -translate-y-1/2 w-3 h-3 bg-teal-500 rounded-full opacity-0'
+        />
+      </div>
     </div>
   );
 }

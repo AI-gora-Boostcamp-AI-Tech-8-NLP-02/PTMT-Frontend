@@ -37,6 +37,17 @@ export const dummyCurriculumGraph: CurriculumGraph = {
           study_load_minutes: 60,
           is_core: true,
         },
+        {
+          resource_id: "res-la-2",
+          name: "3Blue1Brown: Essence of Linear Algebra",
+          url: "https://youtube.com/playlist",
+          type: "video",
+          description: "선형대수 핵심 개념을 시각적으로 설명",
+          difficulty: 2,
+          importance: 7,
+          study_load_minutes: 60,
+          is_core: true,
+        },
       ],
     },
     {
@@ -71,6 +82,17 @@ export const dummyCurriculumGraph: CurriculumGraph = {
       resources: [
         {
           resource_id: "res-rnn-1",
+          name: "Understanding LSTM Networks",
+          url: "https://colah.github.io/posts/2015-08-Understanding-LSTMs/",
+          type: "article",
+          description: "RNN과 LSTM의 핵심 개념을 시각적으로 설명",
+          difficulty: 3,
+          importance: 7,
+          study_load_minutes: 30,
+          is_core: true,
+        },
+        {
+          resource_id: "res-rnn-2",
           name: "Understanding LSTM Networks",
           url: "https://colah.github.io/posts/2015-08-Understanding-LSTMs/",
           type: "article",
@@ -157,6 +179,17 @@ export const dummyCurriculumGraph: CurriculumGraph = {
       resources: [
         {
           resource_id: "res-attn-1",
+          name: "Neural Machine Translation by Jointly Learning to Align and Translate",
+          url: "https://arxiv.org/abs/1409.0473",
+          type: "paper",
+          description: "Bahdanau Attention 원본 논문",
+          difficulty: 6,
+          importance: 9,
+          study_load_minutes: 45,
+          is_core: true,
+        },
+        {
+          resource_id: "res-attn-2",
           name: "Neural Machine Translation by Jointly Learning to Align and Translate",
           url: "https://arxiv.org/abs/1409.0473",
           type: "paper",
