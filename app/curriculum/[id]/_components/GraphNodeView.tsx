@@ -21,7 +21,7 @@ export function CurriculumNodeView({ data, selected }: Props) {
       )}
       <div
         className={`
-        relative min-w-65 rounded-4xl border bg-white px-5 py-20
+        relative min-w-65 rounded-4xl border bg-white px-5 py-15
         shadow-md transition-all duration-300 flex flex-col items-center justify-center text-center
         ${
           selected

@@ -81,13 +81,14 @@ export default function GraphCanvas(props: GraphCanvasProps) {
     props.selectedNodeId,
     setNodes,
     setEdges,
+    props.paperId,
   ]);
 
   return (
     <div className={`w-full h-full`}>
       <ReactFlow
         className='w-full h-full'
-        defaultViewport={{ x: 0, y: 0, zoom: 0.5 }}
+        defaultViewport={{ x: 0, y: 0, zoom: 1 }}
         nodes={rfnodes}
         edges={rfedges}
         onNodesChange={onNodesChange}
