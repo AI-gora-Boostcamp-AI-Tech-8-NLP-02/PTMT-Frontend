@@ -17,11 +17,11 @@ export function CurriculumNodeView({ data, selected }: Props) {
     <div className='relative'>
       {/* 바깥쪽 점선 */}
       {selected && (
-        <div className='absolute -inset-2 rounded-2xl border-2 border-dashed border-blue-700 animate-dash pointer-events-none z-0 scale-105' />
+        <div className='absolute -inset-3 rounded-4xl border-4 border-dashed border-blue-700 animate-dash pointer-events-none z-0 scale-105' />
       )}
       <div
         className={`
-        relative min-w-65 rounded-2xl border bg-white p-5
+        relative min-w-65 rounded-4xl border bg-white px-5 py-20
         shadow-md transition-all duration-300 flex flex-col items-center justify-center text-center
         ${
           selected
@@ -41,7 +41,7 @@ export function CurriculumNodeView({ data, selected }: Props) {
 
         <div>
           {/* title */}
-          <h3 className='text-xl font-bold text-slate-800 leading-snug mb-3 line-clamp-2'>
+          <h3 className='text-3xl font-bold text-slate-800 leading-snug mb-3 line-clamp-2'>
             {keyword}
           </h3>
 
@@ -52,7 +52,7 @@ export function CurriculumNodeView({ data, selected }: Props) {
                 className={`material-symbols-outlined text-4xl transition-colors ${
                   res.is_necessary ? "text-accent" : "text-slate-400"
                 }`}
-                title={res.type} // hover 시 타입 보여주기
+                style={{ fontSize: "56px" }}
               >
                 {RESOURCE_TYPE_ICONS[res.type] || "psychology"}
               </span>
