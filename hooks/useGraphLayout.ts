@@ -18,7 +18,8 @@ interface GraphLayoutResult {
 export function useGraphLayout(
   nodes: CurriculumNode[],
   edges: CurriculumEdge[],
-  startNodeIds: string[] // layer1 기준 노드
+  startNodeIds: string[], // layer1 기준 노드
+  paperId: string // 무조건 마지막 레이어에 위치할 노드 ID
 ): GraphLayoutResult {
   return useMemo(() => {
     // 1️⃣ Adjacency List (Undirected for BFS from startNodeId)
@@ -41,7 +42,9 @@ export function useGraphLayout(
     const queue: { id: string; depth: number }[] = [];
 
     // Start node handling
-    const startNodes = nodes.filter(n => startNodeIds.includes(n.keyword_id));
+    const startNodes = nodes.filter(
+      n => startNodeIds.includes(n.keyword_id) && n.keyword_id !== paperId
+    );
 
     if (startNodes.length > 0) {
       startNodes.forEach(n => {
@@ -49,7 +52,7 @@ export function useGraphLayout(
         visited.add(n.keyword_id);
       });
     } else if (nodes.length > 0) {
-      const startNode = nodes[0];
+      const startNode = nodes.find(n => n.keyword_id !== paperId) || nodes[0];
       queue.push({ id: startNode.keyword_id, depth: 0 });
       visited.add(startNode.keyword_id);
     }
@@ -62,6 +65,7 @@ export function useGraphLayout(
 
       const neighbors = adjacency[id] || [];
       neighbors.forEach(nextId => {
+        if (nextId === paperId) return; // paperId는 탐색 경로에서 제외
         if (!visited.has(nextId)) {
           visited.add(nextId);
           queue.push({ id: nextId, depth: depth + 1 });
@@ -70,10 +74,18 @@ export function useGraphLayout(
     }
 
     // Handle disconnected nodes (if any)
-    const unvisited = nodes.filter(n => !visited.has(n.keyword_id));
+    const unvisited = nodes.filter(
+      n => !visited.has(n.keyword_id) && n.keyword_id !== paperId
+    );
     if (unvisited.length > 0) {
       const nextLayer = layers.length;
       layers[nextLayer] = unvisited.map(n => n.keyword_id);
+    }
+
+    // Force paperId to be the last layer
+    const paperNode = nodes.find(n => n.keyword_id === paperId);
+    if (paperNode) {
+      layers.push([paperId]);
     }
 
     // 3️⃣ Position Calculation (Gap based)
@@ -112,5 +124,5 @@ export function useGraphLayout(
     const sortedNodeIds = layers.flat();
 
     return { positions, sortedNodeIds };
-  }, [nodes, edges, startNodeIds]);
+  }, [nodes, edges, startNodeIds, paperId]);
 }
