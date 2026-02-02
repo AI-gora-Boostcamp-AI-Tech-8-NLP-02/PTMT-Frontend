@@ -10,7 +10,7 @@ import {
   useReactFlow,
 } from "@xyflow/react";
 
-import { MouseEvent, useEffect, WheelEvent } from "react";
+import { MouseEvent, useCallback, useEffect, WheelEvent } from "react";
 import { CurriculumEdge, CurriculumNode } from "../../../../lib/types";
 import CurriculumNodeView from "./GraphNodeView";
 import { PaperNodeView } from "./PaperNodeView";
@@ -58,12 +58,13 @@ export default function GraphCanvas(props: GraphCanvasProps) {
       selected: node.keyword_id === props.selectedNodeId,
     }));
 
-    const mappedEdges = props.edges.map((edge, index) => ({
+    let mappedEdges = props.edges.map((edge, index) => ({
       id: `e-${edge.start}-${edge.end}`,
       source: edge.start,
       target: edge.end,
       type: "default", // or "default", "step", "bezier"
       animated: false,
+      style: {},
       markerEnd: {
         type: MarkerType.ArrowClosed,
         width: 16,
@@ -71,6 +72,37 @@ export default function GraphCanvas(props: GraphCanvasProps) {
         color: "oklch(70.4% 0.04 256.788)",
       },
     }));
+
+    if (props.selectedNodeId) {
+      const connectedEdgeIds = mappedEdges
+        .filter(
+          edge =>
+            edge.source === props.selectedNodeId ||
+            edge.target === props.selectedNodeId
+        )
+        .map(edge => edge.id);
+
+      mappedEdges = mappedEdges.map(edge => {
+        if (connectedEdgeIds.includes(edge.id)) {
+          return {
+            ...edge,
+            animated: true,
+            style: {
+              ...edge.style,
+              stroke: "oklch(48.8% 0.243 264.376)",
+              strokeWidth: 6,
+            },
+            markerEnd: {
+              type: MarkerType.ArrowClosed,
+              width: 16,
+              height: 16,
+              color: "oklch(48.8% 0.243 264.376)",
+            },
+          };
+        }
+        return edge;
+      });
+    }
 
     setNodes(mappedNodes);
     setEdges(mappedEdges);
@@ -84,6 +116,13 @@ export default function GraphCanvas(props: GraphCanvasProps) {
     props.paperId,
   ]);
 
+  const onNodeClick = useCallback(
+    (event: MouseEvent, node: Node) => {
+      props.onNodeSelect(node.data.curriculum as CurriculumNode);
+    },
+    [props]
+  );
+
   return (
     <div className={`w-full h-full`}>
       <ReactFlow
@@ -93,9 +132,7 @@ export default function GraphCanvas(props: GraphCanvasProps) {
         edges={rfedges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
-        onNodeClick={(_, node) =>
-          props.onNodeSelect(node.data.curriculum as CurriculumNode)
-        }
+        onNodeClick={onNodeClick}
         nodeTypes={nodeTypes}
         attributionPosition='bottom-left'
         minZoom={0.01}

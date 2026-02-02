@@ -69,7 +69,7 @@
 
 .react-flow__edge-path {
   stroke: var(--color-slate-400); /* 색상 */
-  stroke-width: 4px; /* 두께 */
+  stroke-width: 6px; /* 두께 */
   stroke-linecap: round; /* 끝 모양 */
 }
 
