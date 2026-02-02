@@ -114,7 +114,13 @@ async function httpRequest<T>(
   if (!response.ok || !json.success) {
     const errorMessage =
       json.error?.message || `HTTP Error: ${response.status}`;
-    throw new Error(errorMessage);
+    const error = new Error(errorMessage) as Error & {
+      status?: number;
+      code?: string;
+    };
+    error.status = response.status;
+    error.code = json.error?.code;
+    throw error;
   }
 
   return json.data as T;
