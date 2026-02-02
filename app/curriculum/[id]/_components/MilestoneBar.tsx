@@ -48,63 +48,64 @@ export const MilestoneBar = memo(function MilestoneBar({
           <span className='material-symbols-outlined text-amber-500'>
             stars
           </span>
-          <h3 className='font-bold text-slate-800 text-lg'>
-            Learning Milestones
-          </h3>
+          <h3 className='font-bold text-slate-800 text-lg'>Starting Points</h3>
         </div>
         <span className='text-xs font-medium text-slate-400 bg-slate-50 px-3 py-1 rounded-full'>
           The Recommended Sequence
         </span>
       </div>
 
-      <div className='flex-1 flex items-center gap-6 overflow-x-auto px-8 py-2 custom-scrollbar'>
-        {nodes.map((node, idx) => {
-          const isSelected = selectedNodeId === node.keyword_id;
+      <div className='flex-1 flex items-center gap-6 overflow-x-auto px-8 py-2 min-w-0'>
+        <div className='flex flex-nowrap w-full justify-between min-w-max'>
+          {nodes.map((node, idx) => {
+            const isSelected = selectedNodeId === node.keyword_id;
 
-          return (
-            <button
-              key={node.keyword_id}
-              onClick={() => handleNodeClick(node)}
-              className={`
-                group flex flex-col items-center gap-3 min-w-25 transition-all duration-300
+            return (
+              <button
+                key={node.keyword_id}
+                onClick={() => handleNodeClick(node)}
+                className={`
+                group flex flex-col items-center gap-3 min-w-25 transition-all duration-300 
                 ${isSelected ? "scale-110 opacity-100" : "opacity-70 hover:opacity-100 hover:scale-105"}
               `}
-            >
-              {/* Large Circle */}
-              <div
-                className={`
+              >
+                {/* Large Circle */}
+                <div
+                  className={`
                   size-16 rounded-2xl flex items-center justify-center relative shadow-md transition-all
                   ${isSelected ? "bg-blue-600 shadow-blue-200" : "bg-white border-2 border-slate-100 group-hover:border-blue-200"}
                 `}
-              >
-                <span
-                  className={`material-symbols-outlined text-3xl ${isSelected ? "text-white" : "text-slate-400 group-hover:text-blue-500"}`}
                 >
-                  {RESOURCE_TYPE_ICONS[node.resources[0]?.type] || "psychology"}
-                </span>
+                  <span
+                    className={`material-symbols-outlined text-3xl ${isSelected ? "text-white" : "text-slate-400 group-hover:text-blue-500"}`}
+                  >
+                    {RESOURCE_TYPE_ICONS[node.resources[0]?.type] ||
+                      "psychology"}
+                  </span>
 
-                {/* Sequence Number */}
-                <div
-                  className={`
+                  {/* Sequence Number */}
+                  <div
+                    className={`
                     absolute -top-2 -right-2 size-6 rounded-lg flex items-center justify-center text-xs font-bold border-2 border-white shadow-sm
                     ${isSelected ? "bg-amber-400 text-amber-950" : "bg-slate-100 text-slate-500"}
                   `}
-                >
-                  {idx + 1}
+                  >
+                    {idx + 1}
+                  </div>
                 </div>
-              </div>
 
-              {/* Label */}
-              <div className='text-center'>
-                <span
-                  className={`text-xs font-bold block whitespace-nowrap ${isSelected ? "text-blue-700" : "text-slate-600"}`}
-                >
-                  {node.keyword}
-                </span>
-              </div>
-            </button>
-          );
-        })}
+                {/* Label */}
+                <div className='text-center'>
+                  <span
+                    className={`text-xs font-bold block whitespace-nowrap ${isSelected ? "text-blue-700" : "text-slate-600"}`}
+                  >
+                    {node.keyword}
+                  </span>
+                </div>
+              </button>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

@@ -70,6 +70,12 @@ export default function CurriculumGraphPage() {
       });
   }, [graph.nodes, sortedNodeIds]);
 
+  const firstNodes: CurriculumNode[] = useMemo(() => {
+    return graph.first_node_order
+      .map(id => graph.nodes.find(n => n.keyword_id === id))
+      .filter((n): n is CurriculumNode => n !== undefined); // undefined 제거
+  }, [graph.nodes, graph.first_node_order]);
+
   // 노드 선택 핸들러 (5.9 Use Functional setState - useCallback으로 안정적인 참조)
   const handleNodeSelect = useCallback((node: CurriculumNode) => {
     setSelectedNode(node);
@@ -138,7 +144,7 @@ export default function CurriculumGraphPage() {
 
           {/* Bottom Milestone Bar */}
           <MilestoneBar
-            nodes={importantNodes}
+            nodes={firstNodes}
             nodePositions={nodePositions}
             selectedNodeId={selectedNode?.keyword_id ?? null}
             zoom={zoom}
