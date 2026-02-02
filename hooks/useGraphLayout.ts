@@ -1,5 +1,5 @@
-import { useMemo } from "react";
 import { CurriculumNode } from "@/lib/types";
+import { useMemo } from "react";
 
 interface NodePosition {
   x: number;
@@ -81,7 +81,8 @@ export function useGraphLayout(
           layer.length === 1
             ? height / 2
             : paddingY +
-              ((height - paddingY * 2) * nodeIdx) / Math.max(layer.length - 1, 1);
+              ((height - paddingY * 2) * nodeIdx) /
+                Math.max(layer.length - 1, 1);
 
         positions[nodeId] = { x, y };
       });

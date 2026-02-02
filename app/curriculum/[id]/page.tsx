@@ -8,10 +8,9 @@ import { Button } from "@/components/ui/button";
 import { useGraphLayout, useZoomPan } from "@/hooks";
 import { dummyCurriculumGraph } from "@/lib/dummy-curriculum";
 import { CurriculumNode } from "@/lib/types";
-import { GraphCanvas } from "./_components/GraphCanvas";
+import GraphCanvasNew from "./_components/GraphCanvasNew";
 import { GraphSidebar } from "./_components/GraphSidebar";
 import { MilestoneBar } from "./_components/MilestoneBar";
-import { ZoomControls } from "./_components/ZoomControls";
 
 /**
  * 커리큘럼 그래프 페이지
@@ -119,16 +118,16 @@ export default function CurriculumGraphPage() {
         />
 
         {/* Graph Area */}
-        <section className='flex-1 flex flex-col relative bg-[#f8fafc] overflow-hidden'>
+        <section className='flex-1 flex flex-col bg-[#f8fafc]'>
           {/* Zoom Controls */}
-          <ZoomControls
+          {/* <ZoomControls
             onZoomIn={zoomIn}
             onZoomOut={zoomOut}
             onReset={resetView}
-          />
+          /> */}
 
           {/* SVG Graph Canvas */}
-          <GraphCanvas
+          <GraphCanvasNew
             nodes={graph.nodes}
             edges={graph.edges}
             nodePositions={nodePositions}

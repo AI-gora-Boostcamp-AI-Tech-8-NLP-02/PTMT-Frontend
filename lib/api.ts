@@ -17,7 +17,8 @@ import {
 // ============================================
 
 // API Base URL - 백엔드 연결 시 이 값만 변경
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 
 // Mock 모드 설정 - 백엔드 연결 시 false로 변경
 const USE_MOCK = true;
@@ -100,7 +101,8 @@ async function httpRequest<T>(
   }));
 
   if (!response.ok || !json.success) {
-    const errorMessage = json.error?.message || `HTTP Error: ${response.status}`;
+    const errorMessage =
+      json.error?.message || `HTTP Error: ${response.status}`;
     throw new Error(errorMessage);
   }
 
@@ -202,7 +204,10 @@ function addMockCurriculum(curriculum: CurriculumListItem) {
   }
 }
 
-function updateMockCurriculumStatus(id: string, status: CurriculumListItem["status"]) {
+function updateMockCurriculumStatus(
+  id: string,
+  status: CurriculumListItem["status"]
+) {
   const curriculum = mockCurriculums.find(c => c.id === id);
   if (curriculum) {
     curriculum.status = status;
@@ -326,7 +331,10 @@ export const userApi = {
     return httpRequest<User>("/users/me");
   },
 
-  async updateProfile(data: { name?: string; avatar_url?: string }): Promise<User> {
+  async updateProfile(data: {
+    name?: string;
+    avatar_url?: string;
+  }): Promise<User> {
     if (USE_MOCK) {
       await delay(300);
       return { ...mockUser, ...data };
@@ -349,7 +357,7 @@ export const paperApi = {
       const paperId = `paper-${Date.now()}`;
       const curriculumId = `curr-${Date.now()}`;
       const paperTitle = file.name.replace(".pdf", "");
-      
+
       // 새 커리큘럼을 목록에 추가 (draft 상태)
       addMockCurriculum({
         id: curriculumId,
@@ -361,7 +369,7 @@ export const paperApi = {
         node_count: 0,
         estimated_hours: 0,
       });
-      
+
       return {
         paper_id: paperId,
         curriculum_id: curriculumId,
@@ -395,7 +403,7 @@ export const paperApi = {
       const paperId = `paper-${Date.now()}`;
       const curriculumId = `curr-${Date.now()}`;
       const paperTitle = "URL에서 분석한 논문";
-      
+
       // 새 커리큘럼을 목록에 추가
       addMockCurriculum({
         id: curriculumId,
@@ -407,7 +415,7 @@ export const paperApi = {
         node_count: 0,
         estimated_hours: 0,
       });
-      
+
       return {
         paper_id: paperId,
         curriculum_id: curriculumId,
@@ -429,7 +437,7 @@ export const paperApi = {
       await delay(1500);
       const paperId = `paper-${Date.now()}`;
       const curriculumId = `curr-${Date.now()}`;
-      
+
       // 새 커리큘럼을 목록에 추가
       addMockCurriculum({
         id: curriculumId,
@@ -441,7 +449,7 @@ export const paperApi = {
         node_count: 0,
         estimated_hours: 0,
       });
-      
+
       return {
         paper_id: paperId,
         curriculum_id: curriculumId,
@@ -464,9 +472,14 @@ export const paperApi = {
 // ============================================
 
 export const curriculumApi = {
-  async getAll(
-    options?: { status?: string; page?: number; limit?: number }
-  ): Promise<{ items: CurriculumListItem[]; pagination: { total: number; has_more: boolean } }> {
+  async getAll(options?: {
+    status?: string;
+    page?: number;
+    limit?: number;
+  }): Promise<{
+    items: CurriculumListItem[];
+    pagination: { total: number; has_more: boolean };
+  }> {
     if (USE_MOCK) {
       await delay(500);
       return {
@@ -478,10 +491,11 @@ export const curriculumApi = {
     if (options?.status) params.set("status", options.status);
     if (options?.page) params.set("page", String(options.page));
     if (options?.limit) params.set("limit", String(options.limit));
-    
-    return httpRequest<{ items: CurriculumListItem[]; pagination: { total: number; has_more: boolean } }>(
-      `/curriculums?${params.toString()}`
-    );
+
+    return httpRequest<{
+      items: CurriculumListItem[];
+      pagination: { total: number; has_more: boolean };
+    }>(`/curriculums?${params.toString()}`);
   },
 
   async getById(curriculumId: string): Promise<Curriculum> {
