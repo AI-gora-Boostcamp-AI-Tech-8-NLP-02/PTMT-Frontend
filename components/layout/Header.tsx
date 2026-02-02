@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { memo, useCallback } from "react";
 import { Logo } from "./Logo";
@@ -43,10 +42,11 @@ export const Header = memo(function Header({
             ) : isAuthenticated ? (
               // 로그인 상태
               <>
-                <div
-                  className={`hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl ${
-                    variant === "dark" ? "bg-background/10" : "bg-secondary"
+                <Button
+                  className={`hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl hover:bg-accent ${
+                    variant === "dark" ? "bg-background/10" : "bg-background"
                   }`}
+                  onClick={() => router.push("/user/history")}
                 >
                   <div className='size-7 rounded-full bg-primary/20 flex items-center justify-center'>
                     <span className='material-symbols-outlined text-primary text-sm'>
@@ -60,7 +60,7 @@ export const Header = memo(function Header({
                   >
                     {user?.name}
                   </span>
-                </div>
+                </Button>
                 <Button
                   variant='ghost'
                   onClick={handleLogout}
@@ -72,14 +72,6 @@ export const Header = memo(function Header({
                 >
                   로그아웃
                 </Button>
-                <Link href='/curriculum/upload-paper'>
-                  <Button className='rounded-xl font-bold bg-primary text-primary-foreground btn-3d px-6'>
-                    <span className='material-symbols-outlined text-lg'>
-                      add
-                    </span>
-                    시작하기
-                  </Button>
-                </Link>
               </>
             ) : (
               // 비로그인 상태
