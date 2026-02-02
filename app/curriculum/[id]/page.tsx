@@ -2,13 +2,13 @@
 
 import { useCallback, useMemo, useState } from "react";
 
+import { AuthLoading } from "@/components/auth/AuthLoading";
 import { Logo } from "@/components/layout";
 import { Button } from "@/components/ui/button";
-import { useGraphLayout, useZoomPan } from "@/hooks";
+import { useAuthGuard, useGraphLayout, useZoomPan } from "@/hooks";
 import { dummyCurriculumGraph } from "@/lib/dummy-curriculum";
 import { CurriculumNode } from "@/lib/types";
 import { useRouter } from "next/navigation";
-import { useAuth } from "../../../lib/auth-context";
 import { GraphCanvas } from "./_components/GraphCanvas";
 import { GraphSidebar } from "./_components/GraphSidebar";
 import { MilestoneBar } from "./_components/MilestoneBar";
@@ -28,8 +28,8 @@ import { ZoomControls } from "./_components/ZoomControls";
  * - useZoomPan: 줌/팬 상태 관리
  */
 export default function CurriculumGraphPage() {
+  const { isAuthenticated, isLoading: authLoading } = useAuthGuard();
   const router = useRouter();
-  const { user, isAuthenticated, isLoading, logout } = useAuth();
 
   const graph = dummyCurriculumGraph;
 
@@ -77,6 +77,10 @@ export default function CurriculumGraphPage() {
   const handleNodeSelect = useCallback((node: CurriculumNode) => {
     setSelectedNode(node);
   }, []);
+
+  if (authLoading || !isAuthenticated) {
+    return <AuthLoading />;
+  }
 
   return (
     <div className='flex flex-col h-screen bg-slate-50 overflow-hidden'>

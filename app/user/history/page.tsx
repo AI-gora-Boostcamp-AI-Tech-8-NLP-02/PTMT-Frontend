@@ -3,8 +3,10 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { AuthLoading } from "@/components/auth/AuthLoading";
 import { curriculumApi } from "@/lib/api";
 import { CurriculumListItem } from "@/lib/types";
+import { useAuthGuard } from "@/hooks";
 import CurriculumList from "./_components/CurriculumList";
 import EmptyState from "./_components/EmptyState";
 import HistoryHeader from "./_components/HistoryHeader";
@@ -20,19 +22,28 @@ import LoadingState from "./_components/LoadingState";
  * - 5.1 Calculate Derived State During Rendering - useMemo로 통계 계산
  */
 export default function CurriculumHistoryPage() {
+  const { isAuthenticated, isLoading: authLoading } = useAuthGuard();
   const router = useRouter();
   const [curriculums, setCurriculums] = useState<CurriculumListItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!isAuthenticated) return;
       setIsLoading(true);
-      const response = await curriculumApi.getAll();
-      setCurriculums(response.items);
-      setIsLoading(false);
+      try {
+        const response = await curriculumApi.getAll();
+        setCurriculums(response.items);
+      } finally {
+        setIsLoading(false);
+      }
     };
     fetchData();
-  }, []);
+  }, [isAuthenticated]);
+
+  if (authLoading || !isAuthenticated) {
+    return <AuthLoading />;
+  }
 
   // 5.1 Calculate Derived State During Rendering
   const stats = useMemo(

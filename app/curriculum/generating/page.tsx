@@ -3,7 +3,9 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import { AuthLoading } from "@/components/auth/AuthLoading";
 import { Logo } from "@/components/layout";
+import { useAuthGuard } from "@/hooks";
 import { useCurriculum } from "@/lib/curriculum-context";
 import { LOADING_STEPS } from "../../../const/loadingStep";
 import LoadingIndicator from "./_component/LoadingIndicator";
@@ -14,12 +16,14 @@ import PaperInfoCard from "./_component/PaperInfoCard";
  * 커리큘럼 생성 로딩 페이지
  */
 export default function GeneratingPage() {
+  const { isAuthenticated, isLoading: authLoading } = useAuthGuard();
   const router = useRouter();
   const { state, completeGeneration } = useCurriculum();
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
+    if (!isAuthenticated) return;
     // 커리큘럼 ID가 없으면 업로드 페이지로
     if (!state.curriculumId) {
       router.push("/curriculum/upload-paper");
@@ -58,7 +62,11 @@ export default function GeneratingPage() {
       clearInterval(stepInterval);
       clearTimeout(completeTimeout);
     };
-  }, [state.curriculumId, router, completeGeneration]);
+  }, [isAuthenticated, state.curriculumId, router, completeGeneration]);
+
+  if (authLoading || !isAuthenticated) {
+    return <AuthLoading />;
+  }
 
   return (
     <div className='min-h-screen flex flex-col items-center justify-center bg-linear-to-br from-secondary/20 via-background to-primary/10 relative overflow-hidden'>

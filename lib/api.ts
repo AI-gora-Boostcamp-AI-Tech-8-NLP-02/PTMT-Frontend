@@ -6,6 +6,7 @@ import {
   CurriculumListItem,
   CurriculumOptions,
   GenerationStatus,
+  Keyword,
   LoginRequest,
   PaperUploadResponse,
   SignupRequest,
@@ -17,8 +18,7 @@ import {
 // ============================================
 
 // API Base URL - 백엔드 연결 시 이 값만 변경
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 // Mock 모드 설정 - 백엔드 연결 시 false로 변경
 const USE_MOCK = false;
@@ -95,10 +95,21 @@ async function httpRequest<T>(
     headers,
   });
 
-  const json: ApiResponse<T> = await response.json().catch(() => ({
-    success: false,
-    error: { code: "PARSE_ERROR", message: "응답을 파싱할 수 없습니다." },
-  }));
+  const text = await response.text();
+  const body = text.trim();
+  let json: ApiResponse<T>;
+  if (body) {
+    try {
+      json = JSON.parse(body) as ApiResponse<T>;
+    } catch {
+      json = {
+        success: false,
+        error: { code: "PARSE_ERROR", message: "응답을 파싱할 수 없습니다." },
+      };
+    }
+  } else {
+    json = { success: response.ok };
+  }
 
   if (!response.ok || !json.success) {
     const errorMessage =
@@ -217,6 +228,35 @@ function updateMockCurriculumStatus(
 
 // Simulated delay
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+function normalizeKeywords(keywords: unknown): Keyword[] {
+  if (!Array.isArray(keywords)) return [];
+  return keywords
+    .map(keyword => {
+      if (typeof keyword === "string") {
+        const name = keyword.trim();
+        return name ? { name } : null;
+      }
+
+      if (keyword && typeof keyword === "object") {
+        const nameValue = (keyword as { name?: unknown }).name;
+        if (typeof nameValue === "string" && nameValue.trim()) {
+          const normalized: Keyword = { name: nameValue.trim() };
+          const idValue = (keyword as { id?: unknown }).id;
+          if (typeof idValue === "string") normalized.id = idValue;
+          const importanceValue = (keyword as { importance?: unknown })
+            .importance;
+          if (typeof importanceValue === "number") {
+            normalized.importance = importanceValue;
+          }
+          return normalized;
+        }
+      }
+
+      return null;
+    })
+    .filter((keyword): keyword is Keyword => Boolean(keyword));
+}
 
 // ============================================
 // Auth API
@@ -394,7 +434,12 @@ export const paperApi = {
 
     if (!response.ok) throw new Error("PDF upload failed");
     const json = await response.json();
-    return json.data;
+    const data = json.data as PaperUploadResponse | undefined;
+    if (!data) throw new Error("PDF upload failed");
+    return {
+      ...data,
+      keywords: normalizeKeywords((data as { keywords?: unknown }).keywords),
+    };
   },
 
   async submitLink(url: string): Promise<PaperUploadResponse> {
@@ -426,10 +471,14 @@ export const paperApi = {
         source_url: url,
       };
     }
-    return httpRequest<PaperUploadResponse>("/papers/link", {
+    const response = await httpRequest<PaperUploadResponse>("/papers/link", {
       method: "POST",
       body: JSON.stringify({ url }),
     });
+    return {
+      ...response,
+      keywords: normalizeKeywords((response as { keywords?: unknown }).keywords),
+    };
   },
 
   async searchByTitle(title: string): Promise<PaperUploadResponse> {
@@ -460,10 +509,14 @@ export const paperApi = {
         keywords: mockExtractedKeywords,
       };
     }
-    return httpRequest<PaperUploadResponse>("/papers/search", {
+    const response = await httpRequest<PaperUploadResponse>("/papers/search", {
       method: "POST",
       body: JSON.stringify({ title }),
     });
+    return {
+      ...response,
+      keywords: normalizeKeywords((response as { keywords?: unknown }).keywords),
+    };
   },
 };
 
