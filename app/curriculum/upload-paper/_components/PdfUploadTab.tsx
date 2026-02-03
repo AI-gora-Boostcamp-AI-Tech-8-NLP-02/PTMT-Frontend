@@ -2,7 +2,7 @@ import { paperApi } from "@/lib/api";
 import { useCurriculum } from "@/lib/curriculum-context";
 import { TabsContent } from "@radix-ui/react-tabs";
 import { useRouter } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 
 interface PdfUploadTabProps {
   setError: (error: string | null) => void;
@@ -10,6 +10,7 @@ interface PdfUploadTabProps {
 
 export default function PdfUploadTab({ setError }: PdfUploadTabProps) {
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [isDragging, setIsDragging] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -69,6 +70,10 @@ export default function PdfUploadTab({ setError }: PdfUploadTabProps) {
     [handleFileSelect]
   );
 
+  const handleDivClick = () => {
+    fileInputRef.current?.click();
+  };
+
   return (
     <div
       className='relative flex flex-col items-center justify-center gap-4 rounded-3xl border-[3px] border-dashed
@@ -80,13 +85,15 @@ export default function PdfUploadTab({ setError }: PdfUploadTabProps) {
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
+          onClick={handleDivClick}
           className='relative flex flex-col items-center justify-center gap-4'
         >
           <input
+            ref={fileInputRef}
             type='file'
             accept='.pdf'
             onChange={handleFileInputChange}
-            className='absolute inset-0 w-full h-full opacity-0 cursor-pointer'
+            className='hidden'
             disabled={isLoading}
           />
           <div

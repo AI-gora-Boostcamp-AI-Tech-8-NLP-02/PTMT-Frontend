@@ -5,17 +5,11 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { AuthLoading } from "@/components/auth/AuthLoading";
 import { Logo } from "@/components/layout";
 import { Button } from "@/components/ui/button";
-import { useGraphLayout, useZoomPan } from "@/hooks";
-import { dummyCurriculumGraph } from "@/lib/dummy-curriculum-2";
-import { CurriculumNode } from "@/lib/types";
-import GraphCanvasNew from "./_components/GraphCanvasNew";
-import { useRouter } from "next/navigation";
-import { useAuth } from "../../../lib/auth-context";
-import { useAuthGuard, useGraphLayout, useZoomPan } from "@/hooks";
+import { useAuthGuard, useGraphLayout } from "@/hooks";
 import { curriculumApi } from "@/lib/api";
 import { CurriculumGraph, CurriculumNode } from "@/lib/types";
 import { useParams, useRouter } from "next/navigation";
-import { GraphCanvas } from "./_components/GraphCanvas";
+import GraphCanvas from "./_components/GraphCanvas";
 import { GraphSidebar } from "./_components/GraphSidebar";
 import { MilestoneBar } from "./_components/MilestoneBar";
 
@@ -26,7 +20,6 @@ import { MilestoneBar } from "./_components/MilestoneBar";
  * - GraphSidebar: 선택된 노드 상세 정보
  * - GraphCanvas: 그래프 SVG 시각화
  * - MilestoneBar: 하단 학습 마일스톤
- * - ZoomControls: 줌 컨트롤
  *
  * 커스텀 훅:
  * - useGraphLayout: 노드 레이아웃 계산
@@ -51,7 +44,33 @@ export default function CurriculumGraphPage() {
       setGraphError(null);
       try {
         const response = await curriculumApi.getGraph(curriculumId);
-        setGraph(response);
+
+        const paperNode: CurriculumNode = {
+          keyword_id: response.meta.paper_id,
+          keyword: response.meta.paper_title,
+          description: response.meta.summarize,
+          importance: 10,
+          is_keyword_necessary: true,
+          resources: [],
+        };
+
+        const nodeMap = new Map(response.nodes.map(n => [n.keyword_id, n]));
+        nodeMap.set(paperNode.keyword_id, paperNode);
+
+        const updatedEdges = response.edges.map(edge => {
+          const startNode = nodeMap.get(edge.start_keyword_id);
+          const endNode = nodeMap.get(edge.end_keyword_id);
+          const isNecessary =
+            !!startNode?.is_keyword_necessary &&
+            !!endNode?.is_keyword_necessary;
+          return { ...edge, is_necessary: isNecessary };
+        });
+
+        setGraph({
+          ...response,
+          nodes: [...response.nodes, paperNode],
+          edges: updatedEdges,
+        });
       } catch (err) {
         setGraphError(
           err instanceof Error ? err.message : "그래프를 불러오지 못했습니다."
@@ -67,49 +86,20 @@ export default function CurriculumGraphPage() {
   // 선택된 노드 상태
   const [selectedNode, setSelectedNode] = useState<CurriculumNode | null>(null);
 
-  useEffect(() => {
-    if (!graph) return;
-    const initial =
-      graph.nodes.find(n => n.keyword_id === "node-attention") ||
-      graph.nodes[0] ||
-      null;
-    setSelectedNode(initial);
-  }, [graph]);
-
   // 그래프 레이아웃 계산 (커스텀 훅)
-  const { positions: nodePositions, sortedNodeIds } = useGraphLayout(
+  const { positions: nodePositions } = useGraphLayout(
     graph?.nodes ?? [],
-    graph?.edges ?? []
-    graph.meta.paper_id
+    graph?.edges ?? [],
+    graph?.meta.paper_id ?? ""
   );
 
-  // 줌/팬 상태 (커스텀 훅)
-  const {
-    zoom,
-    viewBox,
-    isDragging,
-    handleMouseDown,
-    handleMouseMove,
-    handleMouseUp,
-    handleWheel,
-    zoomIn,
-    zoomOut,
-    resetView,
-    panTo,
-  } = useZoomPan();
+  const firstNodes = useMemo(() => {
+    if (!graph?.first_node_order || !graph?.nodes) return [];
 
-  // 중요 노드 목록 (topological order로 정렬)
-  const importantNodes = useMemo(() => {
-    const orderMap = new Map(sortedNodeIds.map((id, index) => [id, index]));
-    return (graph?.nodes ?? [])
-      .filter(n => n.importance >= 7);
-  }, [graph?.nodes, sortedNodeIds]);
-
-  const firstNodes: CurriculumNode[] = useMemo(() => {
     return graph.first_node_order
       .map(id => graph.nodes.find(n => n.keyword_id === id))
-      .filter((n): n is CurriculumNode => n !== undefined); // undefined 제거
-  }, [graph.nodes, graph.first_node_order]);
+      .filter((n): n is CurriculumNode => n !== undefined);
+  }, [graph?.nodes, graph?.first_node_order]);
 
   // 노드 선택 핸들러 (5.9 Use Functional setState - useCallback으로 안정적인 참조)
   const handleNodeSelect = useCallback((node: CurriculumNode) => {
@@ -199,35 +189,28 @@ export default function CurriculumGraphPage() {
         {/* Sidebar - 선택된 노드 상세 정보 */}
         <GraphSidebar
           selectedNode={selectedNode}
-          importantNodes={importantNodes}
+          paper_id={graph.meta.paper_id}
+          paper_authors={graph.meta.paper_authors}
         />
 
         {/* Graph Area */}
         <section className='flex-1 flex flex-col bg-[#f8fafc]'>
           {/* SVG Graph Canvas */}
-          <GraphCanvasNew
+          <GraphCanvas
             nodes={graph.nodes}
             edges={graph.edges}
             paperId={graph.meta.paper_id}
             nodePositions={nodePositions}
             selectedNodeId={selectedNode?.keyword_id ?? null}
-            viewBox={viewBox}
-            isDragging={isDragging}
             onNodeSelect={handleNodeSelect}
-            onMouseDown={handleMouseDown}
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-            onWheel={handleWheel}
           />
 
           {/* Bottom Milestone Bar */}
           <MilestoneBar
-            nodes={firstNodes}
+            nodes={firstNodes ?? []}
             nodePositions={nodePositions}
             selectedNodeId={selectedNode?.keyword_id ?? null}
-            zoom={zoom}
             onNodeSelect={handleNodeSelect}
-            onPanTo={panTo}
           />
         </section>
       </div>

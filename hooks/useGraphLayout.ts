@@ -36,9 +36,9 @@ export function useGraphLayout(
     });
 
     edges.forEach(edge => {
-      if (adj[edge.start] && adj[edge.end]) {
-        adj[edge.start].push(edge.end);
-        inDegree[edge.end]++;
+      if (adj[edge.start_keyword_id] && adj[edge.end_keyword_id]) {
+        adj[edge.start_keyword_id].push(edge.end_keyword_id);
+        inDegree[edge.end_keyword_id]++;
       }
     });
 
@@ -123,8 +123,8 @@ export function useGraphLayout(
     const NODE_HEIGHT = 320;
 
     // 레이어 간 간격 및 랜덤 범위
-    const LAYER_X_GAP = 600;
-    const LAYER_X_JITTER = 1000; // 레이어 중심 기준 좌우 랜덤 범위
+    const LAYER_X_GAP = 800;
+    const LAYER_X_JITTER = 600; // 레이어 중심 기준 좌우 랜덤 범위
 
     const CANVAS_CENTER_Y = 400;
 
@@ -149,7 +149,7 @@ export function useGraphLayout(
     finalLayers.forEach((layer, layerIdx) => {
       // 레이어 내 노드 수에 따라 Y축 분산 범위 동적 계산
       const nodeCount = layer.length;
-      const ySpread = Math.max(1000, nodeCount * NODE_HEIGHT * 1.75);
+      const ySpread = Math.max(1000, nodeCount * NODE_HEIGHT * 1.25);
 
       const layerBaseX = layerIdx * LAYER_X_GAP + 100;
 

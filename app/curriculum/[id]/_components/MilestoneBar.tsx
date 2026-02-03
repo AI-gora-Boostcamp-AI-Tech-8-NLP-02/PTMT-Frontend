@@ -13,9 +13,7 @@ interface MilestoneBarProps {
   nodes: CurriculumNode[];
   nodePositions: Record<string, NodePosition>;
   selectedNodeId: string | null;
-  zoom: number;
   onNodeSelect: (node: CurriculumNode) => void;
-  onPanTo: (x: number, y: number) => void;
 }
 
 /**
@@ -24,21 +22,15 @@ interface MilestoneBarProps {
  */
 export const MilestoneBar = memo(function MilestoneBar({
   nodes,
-  nodePositions,
   selectedNodeId,
   onNodeSelect,
-  onPanTo,
 }: MilestoneBarProps) {
   // 5.9 Use Functional setState - 안정적인 콜백
   const handleNodeClick = useCallback(
     (node: CurriculumNode) => {
       onNodeSelect(node);
-      const pos = nodePositions[node.keyword_id];
-      if (pos) {
-        onPanTo(pos.x, pos.y);
-      }
     },
-    [nodePositions, onNodeSelect, onPanTo]
+    [onNodeSelect]
   );
 
   return (

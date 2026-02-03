@@ -1,8 +1,19 @@
 "use client";
 
-import { CurriculumNode } from "@/lib/types";
-import { memo, MouseEvent, useRef, WheelEvent } from "react";
-import { RESOURCE_TYPE_ICONS } from "../../../../const/resourceType";
+import type { Edge, Node } from "@xyflow/react";
+import {
+  Controls,
+  MarkerType,
+  ReactFlow,
+  useEdgesState,
+  useNodesState,
+  useReactFlow,
+} from "@xyflow/react";
+
+import { MouseEvent, useCallback, useEffect } from "react";
+import { CurriculumEdge, CurriculumNode } from "../../../../lib/types";
+import CurriculumNodeView from "./GraphNodeView";
+import { PaperNodeView } from "./PaperNodeView";
 
 interface NodePosition {
   x: number;
@@ -11,206 +22,162 @@ interface NodePosition {
 
 interface GraphCanvasProps {
   nodes: CurriculumNode[];
-  edges: { from_keyword_id: string; to_keyword_id: string }[];
+  edges: CurriculumEdge[];
+  paperId: string;
   nodePositions: Record<string, NodePosition>;
   selectedNodeId: string | null;
-  viewBox: string;
-  isDragging: boolean;
   onNodeSelect: (node: CurriculumNode) => void;
-  onMouseDown: (e: MouseEvent) => void;
-  onMouseMove: (e: MouseEvent) => void;
-  onMouseUp: () => void;
-  onWheel: (e: WheelEvent<SVGSVGElement>) => void;
 }
 
-/**
- * 그래프 SVG 캔버스 컴포넌트
- * 5.5 Extract to Memoized Components - 복잡한 SVG 렌더링을 memo로 최적화
- */
-export const GraphCanvas = memo(function GraphCanvas({
-  nodes,
-  edges,
-  nodePositions,
-  selectedNodeId,
-  viewBox,
-  isDragging,
-  onNodeSelect,
-  onMouseDown,
-  onMouseMove,
-  onMouseUp,
-  onWheel,
-}: GraphCanvasProps) {
-  const svgRef = useRef<SVGSVGElement>(null);
+const nodeTypes = {
+  curriculum: CurriculumNodeView,
+  paper: PaperNodeView,
+};
+
+export default function GraphCanvas(props: GraphCanvasProps) {
+  const [rfnodes, setNodes, onNodesChange] = useNodesState<Node>([]);
+  const [rfedges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
+
+  useEffect(() => {
+    console.log(props.nodePositions);
+
+    const mappedNodes = props.nodes.map((node, index) => ({
+      id: node.keyword_id,
+      type: node.keyword_id === props.paperId ? "paper" : "curriculum", // or "input", "output", custom node
+      position: props.nodePositions[node.keyword_id],
+      data: {
+        label: node.keyword,
+        curriculum: node,
+      },
+      selected: node.keyword_id === props.selectedNodeId,
+    }));
+
+    let mappedEdges = props.edges.map((edge, index) => ({
+      id: `e-${edge.start_keyword_id}-${edge.end_keyword_id}`,
+      source: edge.start_keyword_id,
+      target: edge.end_keyword_id,
+      type: "default", // or "default", "step", "bezier"
+      animated: false,
+      style: {
+        stroke: edge.is_necessary
+          ? "oklch(0.65 0.08 255)"
+          : "oklch(0.78 0.03 255)",
+        strokeWidth: edge.is_necessary ? 5 : 3,
+        opacity: edge.is_necessary ? 1 : 0.5,
+      },
+      markerEnd: {
+        type: MarkerType.ArrowClosed,
+        width: 16,
+        height: 16,
+        color: "oklch(70.4% 0.04 256.788)",
+      },
+    }));
+
+    if (props.selectedNodeId) {
+      const connectedEdgeIds = mappedEdges
+        .filter(
+          edge =>
+            edge.source === props.selectedNodeId ||
+            edge.target === props.selectedNodeId
+        )
+        .map(edge => edge.id);
+
+      mappedEdges = mappedEdges.map(edge => {
+        if (connectedEdgeIds.includes(edge.id)) {
+          return {
+            ...edge,
+            animated: true,
+            style: {
+              ...edge.style,
+              stroke: "oklch(0.72 0.18 20)",
+              strokeWidth: 6,
+            },
+            markerEnd: {
+              type: MarkerType.ArrowClosed,
+              width: 16,
+              height: 16,
+              color: "oklch(0.72 0.18 20)",
+            },
+          };
+        }
+        return edge;
+      });
+    }
+
+    setNodes(mappedNodes);
+    setEdges(mappedEdges);
+  }, [
+    props.nodes,
+    props.edges,
+    props.nodePositions,
+    props.selectedNodeId,
+    setNodes,
+    setEdges,
+    props.paperId,
+  ]);
+
+  const onNodeClick = useCallback(
+    (event: MouseEvent, node: Node) => {
+      props.onNodeSelect(node.data.curriculum as CurriculumNode);
+    },
+    [props]
+  );
 
   return (
-    <div
-      className={`w-full flex-1 relative overflow-hidden ${isDragging ? "cursor-grabbing" : "cursor-grab"}`}
-      onMouseDown={onMouseDown}
-      onMouseMove={onMouseMove}
-      onMouseUp={onMouseUp}
-      onMouseLeave={onMouseUp}
-    >
-      <svg
-        ref={svgRef}
-        viewBox={viewBox}
+    <div className={`w-full h-full`}>
+      <ReactFlow
         className='w-full h-full'
-        onWheel={onWheel}
+        defaultViewport={{ x: 0, y: 0, zoom: 1 }}
+        nodes={rfnodes}
+        edges={rfedges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onNodeClick={onNodeClick}
+        nodeTypes={nodeTypes}
+        attributionPosition='bottom-left'
+        minZoom={0.01}
       >
-        <defs>
-          <pattern
-            id='grid'
-            width='40'
-            height='40'
-            patternUnits='userSpaceOnUse'
-          >
-            <path
-              d='M 40 0 L 0 0 0 40'
-              fill='none'
-              stroke='#e2e8f0'
-              strokeWidth='0.5'
-            />
-          </pattern>
-          <filter id='soft-shadow' x='-50%' y='-50%' width='200%' height='200%'>
-            <feDropShadow
-              dx='0'
-              dy='4'
-              stdDeviation='8'
-              floodColor='#64748b'
-              floodOpacity='0.1'
-            />
-          </filter>
-          <marker
-            id='arrowhead'
-            markerWidth='10'
-            markerHeight='7'
-            refX='9'
-            refY='3.5'
-            orient='auto'
-          >
-            <path
-              d='M0,0 L10,3.5 L0,7'
-              fill='none'
-              stroke='#94a3b8'
-              strokeWidth='1.5'
-            />
-          </marker>
-        </defs>
-
-        <rect width='100%' height='100%' fill='#f8fafc' />
-        <rect width='100%' height='100%' fill='url(#grid)' />
-
-        {/* Edges */}
-        <g>
-          {edges.map((edge, idx) => {
-            const start = nodePositions[edge.from_keyword_id];
-            const end = nodePositions[edge.to_keyword_id];
-            if (!start || !end) return null;
-
-            const midX = (start.x + end.x) / 2;
-            const cpX = midX;
-
-            return (
-              <path
-                key={idx}
-                d={`M ${start.x + 36} ${start.y} C ${cpX} ${start.y}, ${cpX} ${end.y}, ${end.x - 36} ${end.y}`}
-                fill='none'
-                stroke='#cbd5e1'
-                strokeWidth='2'
-                strokeLinecap='round'
-                markerEnd='url(#arrowhead)'
-              />
-            );
-          })}
-        </g>
-
-        {/* Nodes */}
-        <g>
-          {nodes.map(node => {
-            const pos = nodePositions[node.keyword_id];
-            if (!pos) return null;
-            const isSelected = selectedNodeId === node.keyword_id;
-            const isImportant = node.keyword_importance >= 7;
-
-            return (
-              <g
-                key={node.keyword_id}
-                className='cursor-pointer transition-opacity duration-200'
-                onClick={e => {
-                  e.stopPropagation();
-                  onNodeSelect(node);
-                }}
-              >
-                {/* Selection Glow */}
-                {isSelected && (
-                  <circle
-                    cx={pos.x}
-                    cy={pos.y}
-                    r={44}
-                    fill='none'
-                    stroke='#60a5fa'
-                    strokeWidth='2'
-                    strokeDasharray='6 6'
-                    opacity='0.5'
-                  >
-                    <animateTransform
-                      attributeName='transform'
-                      type='rotate'
-                      from={`0 ${pos.x} ${pos.y}`}
-                      to={`360 ${pos.x} ${pos.y}`}
-                      dur='10s'
-                      repeatCount='indefinite'
-                    />
-                  </circle>
-                )}
-
-                {/* Node Body */}
-                <circle
-                  cx={pos.x}
-                  cy={pos.y}
-                  r={36}
-                  fill='#fff'
-                  stroke={
-                    isSelected ? "#2563eb" : isImportant ? "#f59e0b" : "#cbd5e1"
-                  }
-                  strokeWidth={isSelected ? 3 : isImportant ? 2 : 1.5}
-                  filter='url(#soft-shadow)'
-                />
-
-                {/* Icon */}
-                <foreignObject
-                  x={pos.x - 15}
-                  y={pos.y - 15}
-                  width='30'
-                  height='30'
-                >
-                  <div className='flex items-center justify-center w-full h-full text-slate-500'>
-                    <span
-                      className={`material-symbols-outlined text-[28px] ${isSelected ? "text-blue-600" : isImportant ? "text-amber-500" : "text-slate-400"}`}
-                    >
-                      {RESOURCE_TYPE_ICONS[node.resources[0]?.type] ||
-                        "psychology"}
-                    </span>
-                  </div>
-                </foreignObject>
-
-                {/* Label */}
-                <foreignObject
-                  x={pos.x - 80}
-                  y={pos.y + 45}
-                  width='160'
-                  height='40'
-                >
-                  <div
-                    className={`text-center text-[12px] font-bold leading-tight line-clamp-2 ${isSelected ? "text-blue-700" : "text-slate-600"}`}
-                  >
-                    {node.keyword}
-                  </div>
-                </foreignObject>
-              </g>
-            );
-          })}
-        </g>
-      </svg>
+        <Controls />
+        <FitViewOnLoad nodes={rfnodes} />
+        <FocusOnNode selectedNodeId={props.selectedNodeId} />
+      </ReactFlow>
     </div>
   );
-});
+}
+
+function FitViewOnLoad({ nodes }: { nodes: Node[] }) {
+  const reactFlow = useReactFlow();
+
+  useEffect(() => {
+    if (nodes.length === 0) return;
+
+    requestAnimationFrame(() => {
+      reactFlow.fitView({ padding: 0.2 });
+    });
+  }, [nodes.length, reactFlow]);
+
+  return null;
+}
+
+function FocusOnNode({ selectedNodeId }: { selectedNodeId: string | null }) {
+  const { setCenter, getZoom, getNode } = useReactFlow();
+
+  useEffect(() => {
+    if (!selectedNodeId) return;
+
+    const node = getNode(selectedNodeId);
+    if (!node) return;
+
+    const width = node.measured?.width ?? 0;
+    const height = node.measured?.height ?? 0;
+
+    const x = node.position.x + width / 2;
+    const y = node.position.y + height / 2;
+
+    const zoom = getZoom();
+
+    setCenter(x, y, { zoom, duration: 1000 });
+  }, [selectedNodeId, getNode, setCenter, getZoom]);
+
+  return null;
+}

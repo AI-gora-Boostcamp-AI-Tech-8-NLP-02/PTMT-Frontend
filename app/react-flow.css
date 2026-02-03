@@ -1,5 +1,5 @@
 /* xyflow theme files. Delete these to start from our base */
-@import url("@xyflow/react/dist/style.css");
+/* @import url("@xyflow/react/dist/style.css"); */
 
 .react-flow {
   --xy-background-color: #f7f9fb;
