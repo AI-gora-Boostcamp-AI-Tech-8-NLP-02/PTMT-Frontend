@@ -23,7 +23,6 @@ export default function GeneratingPage() {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [progress, setProgress] = useState(0);
   const [statusText, setStatusText] = useState<string | null>(null);
-  const [hasStartedPolling, setHasStartedPolling] = useState(false);
   const [pollError, setPollError] = useState<string | null>(null);
   const [isReady, setIsReady] = useState(false);
   const startTimeRef = useRef<number | null>(null);
@@ -32,11 +31,12 @@ export default function GeneratingPage() {
 
   useEffect(() => {
     if (!isAuthenticated) return;
-    // 커리큘럼 ID가 없으면 업로드 페이지로
     if (!state.curriculumId) {
       router.push("/curriculum/upload-paper");
       return;
     }
+
+    if (isReady || pollError) return;
 
     startTimeRef.current = Date.now();
     lastTickRef.current = Date.now();
@@ -78,25 +78,18 @@ export default function GeneratingPage() {
     }, 200);
 
     const stepInterval = setInterval(() => {
+      if (isReady || pollError) return;
       setCurrentStepIndex(prev =>
         prev >= LOADING_STEPS.length - 1 ? 0 : prev + 1
       );
     }, 5000);
-    setHasStartedPolling(true);
-
-    return () => {
-      clearInterval(progressInterval);
-      clearInterval(stepInterval);
-    };
-  }, [isAuthenticated, state.curriculumId, isReady, pollError]);
-
-  useEffect(() => {
-    if (!isAuthenticated || !state.curriculumId || !hasStartedPolling) return;
 
     let isActive = true;
     const poll = async () => {
       if (pollError) return;
       try {
+        if (!state.curriculumId) return;
+
         const response = await curriculumApi.checkStatus(state.curriculumId);
         if (!isActive) return;
 
@@ -107,14 +100,12 @@ export default function GeneratingPage() {
         if (response.status === "ready") {
           setIsReady(true);
         } else if (response.status === "failed") {
-          setPollError("커리큘럼 생성에 실패했습니다.");
+          setPollError("커리큘큘럼 생성에 실패했습니다.");
         }
       } catch (err) {
         if (!isActive) return;
         setPollError(
-          err instanceof Error
-            ? err.message
-            : "생성 상태 확인에 실패했습니다."
+          err instanceof Error ? err.message : "생성 상태 확인에 실패했습니다."
         );
       }
     };
@@ -123,17 +114,12 @@ export default function GeneratingPage() {
     const pollInterval = setInterval(poll, 8000);
 
     return () => {
+      clearInterval(progressInterval);
+      clearInterval(stepInterval);
       isActive = false;
       clearInterval(pollInterval);
     };
-  }, [
-    isAuthenticated,
-    state.curriculumId,
-    hasStartedPolling,
-    pollError,
-    completeGeneration,
-    router,
-  ]);
+  }, [isAuthenticated, state.curriculumId, isReady, pollError, router]);
 
   useEffect(() => {
     if (!isReady || !state.curriculumId) return;
