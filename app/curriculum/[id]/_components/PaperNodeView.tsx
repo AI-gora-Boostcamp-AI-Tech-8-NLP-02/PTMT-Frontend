@@ -24,9 +24,9 @@ export function PaperNodeView({ data, selected }: Props) {
         shadow-md transition-all duration-300 flex flex-col items-center justify-center text-center
         ${
           selected
-            ? "border-blue-700 border-6 shadow-lg scale-105 z-10"
+            ? "border-blue-700 border-9 shadow-lg scale-105 z-10"
             : is_keyword_necessary
-              ? "border-accent border-5"
+              ? "border-primary border-8"
               : "border-slate-100 hover:border-slate-300 hover:shadow-lg"
         }
       `}
