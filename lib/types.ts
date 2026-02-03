@@ -192,7 +192,7 @@ export interface Curriculum {
 export interface GenerationStatus {
   curriculum_id: string;
   status: CurriculumStatus;
-  progress_percent: number;
+  progress_percent: number | null;
   current_step: string;
 }
 

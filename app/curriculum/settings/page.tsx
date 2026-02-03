@@ -3,8 +3,10 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
+import { AuthLoading } from "@/components/auth/AuthLoading";
 import { Header } from "@/components/layout";
 import { Button } from "@/components/ui/button";
+import { useAuthGuard } from "@/hooks";
 import { curriculumApi } from "@/lib/api";
 import { useCurriculum } from "@/lib/curriculum-context";
 import { CurriculumPurpose, ResourceType, UserLevel } from "@/lib/types";
@@ -18,6 +20,7 @@ import { TimeSection } from "./_components/TimeSection";
  * 커리큘럼 설정 페이지
  */
 export default function CurriculumSettingsPage() {
+  const { isAuthenticated, isLoading: authLoading } = useAuthGuard();
   const router = useRouter();
   const { state, setOptions, startGeneration } = useCurriculum();
 
@@ -32,13 +35,15 @@ export default function CurriculumSettingsPage() {
     "article",
   ]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   // 7.8 Early Return - paper 없으면 리다이렉트
   useEffect(() => {
-    if (!state.paper) {
+    if (!isAuthenticated) return;
+    if (!state.paper || !state.curriculumId) {
       router.push("/curriculum/upload-paper");
     }
-  }, [state.paper, router]);
+  }, [isAuthenticated, state.paper, state.curriculumId, router]);
 
   // 5.9 Use Functional setState - useCallback으로 안정적인 참조
   const handlePurposeChange = useCallback((value: CurriculumPurpose) => {
@@ -66,8 +71,14 @@ export default function CurriculumSettingsPage() {
   }, []);
 
   const handleSubmit = useCallback(async () => {
-    if (!state.curriculumId) return;
+    if (!state.curriculumId) {
+      setSubmitError(
+        "커리큘럼 정보를 찾을 수 없습니다. 다시 논문을 업로드해주세요."
+      );
+      return;
+    }
     setIsSubmitting(true);
+    setSubmitError(null);
 
     try {
       const options = {
@@ -88,6 +99,11 @@ export default function CurriculumSettingsPage() {
       router.push("/curriculum/generating");
     } catch (err) {
       console.error("Failed to start generation:", err);
+      setSubmitError(
+        err instanceof Error
+          ? err.message
+          : "커리큘럼 생성 요청에 실패했습니다."
+      );
       setIsSubmitting(false);
     }
   }, [
@@ -102,6 +118,10 @@ export default function CurriculumSettingsPage() {
     startGeneration,
     router,
   ]);
+
+  if (authLoading || !isAuthenticated) {
+    return <AuthLoading />;
+  }
 
   // 7.8 Early Return
   if (!state.paper) return null;
@@ -123,6 +143,12 @@ export default function CurriculumSettingsPage() {
               &quot;{state.paper.title}&quot; 논문에 맞는 커리큘럼을 설계합니다.
             </p>
           </div>
+
+          {submitError && (
+            <div className='mb-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700'>
+              {submitError}
+            </div>
+          )}
 
           <div className='space-y-6'>
             {/* 1. Purpose */}

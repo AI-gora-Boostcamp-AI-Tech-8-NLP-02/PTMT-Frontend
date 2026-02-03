@@ -1,14 +1,14 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { AuthLoading } from "@/components/auth/AuthLoading";
 import { Logo } from "@/components/layout";
 import { Button } from "@/components/ui/button";
-import { useGraphLayout, useZoomPan } from "@/hooks";
-import { dummyCurriculumGraph } from "@/lib/dummy-curriculum";
-import { CurriculumNode } from "@/lib/types";
-import { useRouter } from "next/navigation";
-import { useAuth } from "../../../lib/auth-context";
+import { useAuthGuard, useGraphLayout, useZoomPan } from "@/hooks";
+import { curriculumApi } from "@/lib/api";
+import { CurriculumGraph, CurriculumNode } from "@/lib/types";
+import { useParams, useRouter } from "next/navigation";
 import { GraphCanvas } from "./_components/GraphCanvas";
 import { GraphSidebar } from "./_components/GraphSidebar";
 import { MilestoneBar } from "./_components/MilestoneBar";
@@ -28,22 +28,53 @@ import { ZoomControls } from "./_components/ZoomControls";
  * - useZoomPan: 줌/팬 상태 관리
  */
 export default function CurriculumGraphPage() {
+  const { isAuthenticated, isLoading: authLoading } = useAuthGuard();
+  const params = useParams<{ id: string }>();
   const router = useRouter();
-  const { user, isAuthenticated, isLoading, logout } = useAuth();
 
-  const graph = dummyCurriculumGraph;
+  const [graph, setGraph] = useState<CurriculumGraph | null>(null);
+  const [isGraphLoading, setIsGraphLoading] = useState(true);
+  const [graphError, setGraphError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    const curriculumId = params?.id;
+    if (!curriculumId) return;
+
+    const fetchGraph = async () => {
+      setIsGraphLoading(true);
+      setGraphError(null);
+      try {
+        const response = await curriculumApi.getGraph(curriculumId);
+        setGraph(response);
+      } catch (err) {
+        setGraphError(
+          err instanceof Error ? err.message : "그래프를 불러오지 못했습니다."
+        );
+      } finally {
+        setIsGraphLoading(false);
+      }
+    };
+
+    fetchGraph();
+  }, [isAuthenticated, params]);
 
   // 선택된 노드 상태
-  const [selectedNode, setSelectedNode] = useState<CurriculumNode | null>(
-    graph.nodes.find(n => n.keyword_id === "node-attention") ||
+  const [selectedNode, setSelectedNode] = useState<CurriculumNode | null>(null);
+
+  useEffect(() => {
+    if (!graph) return;
+    const initial =
+      graph.nodes.find(n => n.keyword_id === "node-attention") ||
       graph.nodes[0] ||
-      null
-  );
+      null;
+    setSelectedNode(initial);
+  }, [graph]);
 
   // 그래프 레이아웃 계산 (커스텀 훅)
   const { positions: nodePositions, sortedNodeIds } = useGraphLayout(
-    graph.nodes,
-    graph.edges
+    graph?.nodes ?? [],
+    graph?.edges ?? []
   );
 
   // 줌/팬 상태 (커스텀 훅)
@@ -64,19 +95,48 @@ export default function CurriculumGraphPage() {
   // 중요 노드 목록 (topological order로 정렬)
   const importantNodes = useMemo(() => {
     const orderMap = new Map(sortedNodeIds.map((id, index) => [id, index]));
-    return graph.nodes
+    return (graph?.nodes ?? [])
       .filter(n => n.importance >= 7)
       .sort((a, b) => {
         const orderA = orderMap.get(a.keyword_id) ?? 999;
         const orderB = orderMap.get(b.keyword_id) ?? 999;
         return orderA - orderB;
       });
-  }, [graph.nodes, sortedNodeIds]);
+  }, [graph?.nodes, sortedNodeIds]);
 
   // 노드 선택 핸들러 (5.9 Use Functional setState - useCallback으로 안정적인 참조)
   const handleNodeSelect = useCallback((node: CurriculumNode) => {
     setSelectedNode(node);
   }, []);
+
+  if (authLoading || !isAuthenticated) {
+    return <AuthLoading />;
+  }
+
+  if (isGraphLoading) {
+    return <AuthLoading />;
+  }
+
+  if (graphError) {
+    return (
+      <div className='min-h-screen flex items-center justify-center bg-background px-6 text-center'>
+        <div className='max-w-lg'>
+          <h2 className='text-xl font-bold mb-2'>그래프 불러오기 실패</h2>
+          <p className='text-sm text-muted-foreground'>{graphError}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!graph) {
+    return (
+      <div className='min-h-screen flex items-center justify-center bg-background px-6 text-center'>
+        <div className='max-w-lg'>
+          <h2 className='text-xl font-bold mb-2'>그래프 정보가 없습니다</h2>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className='flex flex-col h-screen bg-slate-50 overflow-hidden'>
