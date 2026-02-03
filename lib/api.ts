@@ -1,4 +1,4 @@
-import { dummyCurriculumGraph } from "./dummy-curriculum-2";
+// import { dummyCurriculumGraph } from "./dummy-curriculum-2";
 import {
   AuthResponse,
   Curriculum,
@@ -483,7 +483,9 @@ export const paperApi = {
     });
     return {
       ...response,
-      keywords: normalizeKeywords((response as { keywords?: unknown }).keywords),
+      keywords: normalizeKeywords(
+        (response as { keywords?: unknown }).keywords
+      ),
     };
   },
 
@@ -521,7 +523,9 @@ export const paperApi = {
     });
     return {
       ...response,
-      keywords: normalizeKeywords((response as { keywords?: unknown }).keywords),
+      keywords: normalizeKeywords(
+        (response as { keywords?: unknown }).keywords
+      ),
     };
   },
 };
@@ -647,10 +651,10 @@ export const curriculumApi = {
   },
 
   async getGraph(curriculumId: string): Promise<CurriculumGraph> {
-    if (USE_MOCK) {
-      await delay(500);
-      return dummyCurriculumGraph;
-    }
+    // if (USE_MOCK) {
+    //   await delay(500);
+    //   return dummyCurriculumGraph;
+    // }
     return httpRequest<CurriculumGraph>(`/curriculums/${curriculumId}/graph`);
   },
 

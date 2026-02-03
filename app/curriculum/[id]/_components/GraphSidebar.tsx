@@ -78,7 +78,7 @@ export const GraphSidebar = memo(function GraphSidebar({
                     text-xs font-semibold text-accent
                   `}
                   >
-                    {selectedNode.keyword_importance}
+                    {selectedNode.importance}
                   </span>
                 </span>
               </div>
@@ -158,7 +158,7 @@ export const GraphSidebar = memo(function GraphSidebar({
                     </div>
                     <div className='text-center border-l border-slate-200'>
                       <div className='text-xs font-bold text-slate-700'>
-                        {resource.study_load}h
+                        {resource.study_load_minutes}h
                       </div>
                       <div className='text-[9px] text-slate-400 uppercase'>
                         Time
@@ -198,7 +198,7 @@ export const GraphSidebar = memo(function GraphSidebar({
                   </span>
                 </div>
                 <p className='text-xs text-slate-300 leading-relaxed'>
-                  {selectedResource.resource_description}
+                  {selectedResource.description}
                 </p>
               </div>
             </div>

@@ -53,9 +53,9 @@ export default function GraphCanvas(props: GraphCanvasProps) {
     }));
 
     let mappedEdges = props.edges.map((edge, index) => ({
-      id: `e-${edge.start}-${edge.end}`,
-      source: edge.start,
-      target: edge.end,
+      id: `e-${edge.start_keyword_id}-${edge.end_keyword_id}`,
+      source: edge.start_keyword_id,
+      target: edge.end_keyword_id,
       type: "default", // or "default", "step", "bezier"
       animated: false,
       style: {},

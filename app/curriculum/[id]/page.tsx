@@ -48,9 +48,8 @@ export default function CurriculumGraphPage() {
         const paperNode: CurriculumNode = {
           keyword_id: response.meta.paper_id,
           keyword: response.meta.paper_title,
-          description: "dummy",
-          // description: response.meta.summarize,
-          keyword_importance: 10,
+          description: response.meta.summarize,
+          importance: 10,
           is_keyword_necessary: true,
           resources: [],
         };
@@ -71,27 +70,12 @@ export default function CurriculumGraphPage() {
   // 선택된 노드 상태
   const [selectedNode, setSelectedNode] = useState<CurriculumNode | null>(null);
 
-  useEffect(() => {
-    if (!graph) return;
-    const initial =
-      graph.nodes.find(n => n.keyword_id === "node-attention") ||
-      graph.nodes[0] ||
-      null;
-    setSelectedNode(initial);
-  }, [graph]);
-
   // 그래프 레이아웃 계산 (커스텀 훅)
-  const { positions: nodePositions, sortedNodeIds } = useGraphLayout(
+  const { positions: nodePositions } = useGraphLayout(
     graph?.nodes ?? [],
     graph?.edges ?? [],
     graph?.meta.paper_id ?? ""
   );
-
-  // 중요 노드 목록 (topological order로 정렬)
-  const importantNodes = useMemo(() => {
-    const orderMap = new Map(sortedNodeIds.map((id, index) => [id, index]));
-    return (graph?.nodes ?? []).filter(n => n.keyword_importance >= 7);
-  }, [graph?.nodes, sortedNodeIds]);
 
   const firstNodes = useMemo(() => {
     if (!graph?.first_node_order || !graph?.nodes) return [];

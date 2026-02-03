@@ -122,10 +122,10 @@ export interface Resource {
   resource_name: string;
   url?: string;
   type: ResourceType;
-  resource_description: string;
+  description: string;
   difficulty?: number;
   importance?: number;
-  study_load?: number;
+  study_load_minutes?: number;
   is_necessary?: boolean;
 }
 
@@ -133,15 +133,15 @@ export interface CurriculumNode {
   keyword_id: string;
   keyword: string;
   description: string;
-  keyword_importance: number;
+  importance: number;
   is_keyword_necessary: boolean;
   layer?: number;
   resources: Resource[];
 }
 
 export interface CurriculumEdge {
-  start: string;
-  end: string;
+  start_keyword_id: string;
+  end_keyword_id: string;
   // relationship?: string;
 }
 
@@ -153,6 +153,7 @@ export interface CurriculumGraphMeta {
   created_at: string;
   total_study_time_hours: number;
   total_nodes: number;
+  summarize: string;
 }
 
 export interface CurriculumGraph {
