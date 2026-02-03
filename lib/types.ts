@@ -119,7 +119,7 @@ export interface CurriculumOptions {
 
 export interface Resource {
   resource_id: string;
-  resource_name: string;
+  name: string;
   url?: string;
   type: ResourceType;
   description: string;

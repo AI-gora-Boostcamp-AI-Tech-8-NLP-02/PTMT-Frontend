@@ -133,7 +133,7 @@ export const GraphSidebar = memo(function GraphSidebar({
                         )}
                       </div>
                       <h4 className='text-sm font-bold text-slate-800 leading-snug'>
-                        {resource.resource_name}
+                        {resource.name}
                       </h4>
                     </div>
                   </div>
