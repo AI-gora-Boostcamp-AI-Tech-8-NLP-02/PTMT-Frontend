@@ -5,11 +5,11 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { AuthLoading } from "@/components/auth/AuthLoading";
 import { Logo } from "@/components/layout";
 import { Button } from "@/components/ui/button";
-import { useAuthGuard, useGraphLayout, useZoomPan } from "@/hooks";
+import { useAuthGuard, useGraphLayout } from "@/hooks";
 import { curriculumApi } from "@/lib/api";
 import { CurriculumGraph, CurriculumNode } from "@/lib/types";
 import { useParams, useRouter } from "next/navigation";
-import GraphCanvasNew from "./_components/GraphCanvasNew";
+import GraphCanvas from "./_components/GraphCanvas";
 import { GraphSidebar } from "./_components/GraphSidebar";
 import { MilestoneBar } from "./_components/MilestoneBar";
 
@@ -20,7 +20,6 @@ import { MilestoneBar } from "./_components/MilestoneBar";
  * - GraphSidebar: 선택된 노드 상세 정보
  * - GraphCanvas: 그래프 SVG 시각화
  * - MilestoneBar: 하단 학습 마일스톤
- * - ZoomControls: 줌 컨트롤
  *
  * 커스텀 훅:
  * - useGraphLayout: 노드 레이아웃 계산
@@ -45,7 +44,18 @@ export default function CurriculumGraphPage() {
       setGraphError(null);
       try {
         const response = await curriculumApi.getGraph(curriculumId);
-        setGraph(response);
+
+        const paperNode: CurriculumNode = {
+          keyword_id: response.meta.paper_id,
+          keyword: response.meta.paper_title,
+          description: "dummy",
+          // description: response.meta.summarize,
+          keyword_importance: 10,
+          is_keyword_necessary: true,
+          resources: [],
+        };
+
+        setGraph({ ...response, nodes: [...response.nodes, paperNode] });
       } catch (err) {
         setGraphError(
           err instanceof Error ? err.message : "그래프를 불러오지 못했습니다."
@@ -76,21 +86,6 @@ export default function CurriculumGraphPage() {
     graph?.edges ?? [],
     graph?.meta.paper_id ?? ""
   );
-
-  // 줌/팬 상태 (커스텀 훅)
-  const {
-    zoom,
-    viewBox,
-    isDragging,
-    handleMouseDown,
-    handleMouseMove,
-    handleMouseUp,
-    handleWheel,
-    zoomIn,
-    zoomOut,
-    resetView,
-    panTo,
-  } = useZoomPan();
 
   // 중요 노드 목록 (topological order로 정렬)
   const importantNodes = useMemo(() => {
@@ -192,27 +187,18 @@ export default function CurriculumGraphPage() {
 
       <div className='flex flex-1 overflow-hidden relative'>
         {/* Sidebar - 선택된 노드 상세 정보 */}
-        <GraphSidebar
-          selectedNode={selectedNode}
-          importantNodes={importantNodes}
-        />
+        <GraphSidebar selectedNode={selectedNode} />
 
         {/* Graph Area */}
         <section className='flex-1 flex flex-col bg-[#f8fafc]'>
           {/* SVG Graph Canvas */}
-          <GraphCanvasNew
+          <GraphCanvas
             nodes={graph.nodes}
             edges={graph.edges}
             paperId={graph.meta.paper_id}
             nodePositions={nodePositions}
             selectedNodeId={selectedNode?.keyword_id ?? null}
-            viewBox={viewBox}
-            isDragging={isDragging}
             onNodeSelect={handleNodeSelect}
-            onMouseDown={handleMouseDown}
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-            onWheel={handleWheel}
           />
 
           {/* Bottom Milestone Bar */}
@@ -220,9 +206,7 @@ export default function CurriculumGraphPage() {
             nodes={firstNodes ?? []}
             nodePositions={nodePositions}
             selectedNodeId={selectedNode?.keyword_id ?? null}
-            zoom={zoom}
             onNodeSelect={handleNodeSelect}
-            onPanTo={panTo}
           />
         </section>
       </div>

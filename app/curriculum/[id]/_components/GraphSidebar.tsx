@@ -10,7 +10,6 @@ import {
 
 interface GraphSidebarProps {
   selectedNode: CurriculumNode | null;
-  importantNodes: CurriculumNode[];
 }
 
 // 6.3 Hoist Static JSX - 정적 JSX를 컴포넌트 외부로 hoist
@@ -29,7 +28,6 @@ const emptyState = (
  */
 export const GraphSidebar = memo(function GraphSidebar({
   selectedNode,
-  importantNodes,
 }: GraphSidebarProps) {
   const [selectedResourceId, setSelectedResourceId] = useState<string | null>(
     selectedNode?.resources?.[0]?.resource_id ?? null
@@ -44,10 +42,6 @@ export const GraphSidebar = memo(function GraphSidebar({
       </aside>
     );
   }
-
-  const nodeIndex = importantNodes.findIndex(
-    n => n.keyword_id === selectedNode.keyword_id
-  );
 
   const selectedResource = selectedNode.resources.find(
     r => r.resource_id === selectedResourceId
