@@ -58,7 +58,13 @@ export default function GraphCanvas(props: GraphCanvasProps) {
       target: edge.end_keyword_id,
       type: "default", // or "default", "step", "bezier"
       animated: false,
-      style: {},
+      style: {
+        stroke: edge.is_necessary
+          ? "oklch(0.65 0.08 255)"
+          : "oklch(0.78 0.03 255)",
+        strokeWidth: edge.is_necessary ? 5 : 3,
+        opacity: edge.is_necessary ? 1 : 0.5,
+      },
       markerEnd: {
         type: MarkerType.ArrowClosed,
         width: 16,
@@ -83,14 +89,14 @@ export default function GraphCanvas(props: GraphCanvasProps) {
             animated: true,
             style: {
               ...edge.style,
-              stroke: "oklch(48.8% 0.243 264.376)",
+              stroke: "oklch(0.72 0.18 20)",
               strokeWidth: 6,
             },
             markerEnd: {
               type: MarkerType.ArrowClosed,
               width: 16,
               height: 16,
-              color: "oklch(48.8% 0.243 264.376)",
+              color: "oklch(0.72 0.18 20)",
             },
           };
         }

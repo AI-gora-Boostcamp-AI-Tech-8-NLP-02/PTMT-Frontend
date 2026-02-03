@@ -20,7 +20,7 @@ export function PaperNodeView({ data, selected }: Props) {
       )}
       <div
         className={`
-        relative w-65 h-65 rounded-full border bg-white px-5 py-20
+        relative w-180 h-70 rounded-full border bg-white px-5 py-20
         shadow-md transition-all duration-300 flex flex-col items-center justify-center text-center
         ${
           selected

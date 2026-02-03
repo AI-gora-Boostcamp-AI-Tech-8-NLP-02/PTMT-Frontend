@@ -54,7 +54,23 @@ export default function CurriculumGraphPage() {
           resources: [],
         };
 
-        setGraph({ ...response, nodes: [...response.nodes, paperNode] });
+        const nodeMap = new Map(response.nodes.map(n => [n.keyword_id, n]));
+        nodeMap.set(paperNode.keyword_id, paperNode);
+
+        const updatedEdges = response.edges.map(edge => {
+          const startNode = nodeMap.get(edge.start_keyword_id);
+          const endNode = nodeMap.get(edge.end_keyword_id);
+          const isNecessary =
+            !!startNode?.is_keyword_necessary &&
+            !!endNode?.is_keyword_necessary;
+          return { ...edge, is_necessary: isNecessary };
+        });
+
+        setGraph({
+          ...response,
+          nodes: [...response.nodes, paperNode],
+          edges: updatedEdges,
+        });
       } catch (err) {
         setGraphError(
           err instanceof Error ? err.message : "그래프를 불러오지 못했습니다."

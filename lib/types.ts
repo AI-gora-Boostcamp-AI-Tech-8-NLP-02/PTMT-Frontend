@@ -142,6 +142,7 @@ export interface CurriculumNode {
 export interface CurriculumEdge {
   start_keyword_id: string;
   end_keyword_id: string;
+  is_necessary?: boolean;
   // relationship?: string;
 }
 
