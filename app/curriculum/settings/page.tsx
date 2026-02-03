@@ -32,7 +32,7 @@ export default function CurriculumSettingsPage() {
   const [dailyHours, setDailyHours] = useState(2);
   const [preferredResources, setPreferredResources] = useState<ResourceType[]>([
     "paper",
-    "article",
+    "web_doc",
   ]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);

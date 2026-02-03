@@ -171,7 +171,11 @@ export default function CurriculumGraphPage() {
 
       <div className='flex flex-1 overflow-hidden relative'>
         {/* Sidebar - 선택된 노드 상세 정보 */}
-        <GraphSidebar selectedNode={selectedNode} />
+        <GraphSidebar
+          selectedNode={selectedNode}
+          paper_id={graph.meta.paper_id}
+          paper_authors={graph.meta.paper_authors}
+        />
 
         {/* Graph Area */}
         <section className='flex-1 flex flex-col bg-[#f8fafc]'>
