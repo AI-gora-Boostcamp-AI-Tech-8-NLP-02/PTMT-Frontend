@@ -23,7 +23,7 @@ export type UserLevel =
   | "researcher"
   | "industry";
 
-export type ResourceType = "paper" | "article" | "video" | "code";
+export type ResourceType = "paper" | "web_doc" | "video";
 
 // ============================================
 // User Types
@@ -119,29 +119,30 @@ export interface CurriculumOptions {
 
 export interface Resource {
   resource_id: string;
-  name: string;
+  resource_name: string;
   url?: string;
   type: ResourceType;
-  description: string;
-  difficulty: number;
-  importance: number;
-  study_load_minutes: number;
-  is_core: boolean;
+  resource_description: string;
+  difficulty?: number;
+  importance?: number;
+  study_load?: number;
+  is_necessary?: boolean;
 }
 
 export interface CurriculumNode {
   keyword_id: string;
   keyword: string;
   description: string;
-  importance: number;
+  keyword_importance: number;
+  is_keyword_necessary: boolean;
   layer?: number;
   resources: Resource[];
 }
 
 export interface CurriculumEdge {
-  from_keyword_id: string;
-  to_keyword_id: string;
-  relationship?: string;
+  start: string;
+  end: string;
+  // relationship?: string;
 }
 
 export interface CurriculumGraphMeta {
@@ -156,6 +157,7 @@ export interface CurriculumGraphMeta {
 
 export interface CurriculumGraph {
   meta: CurriculumGraphMeta;
+  first_node_order: string[];
   nodes: CurriculumNode[];
   edges: CurriculumEdge[];
 }
@@ -219,9 +221,8 @@ export const LEVEL_LABELS: Record<UserLevel, string> = {
 
 export const RESOURCE_TYPE_LABELS: Record<ResourceType, string> = {
   paper: "원문 논문",
-  article: "블로그/아티클",
+  web_doc: "블로그/아티클",
   video: "영상 강의",
-  code: "코드/튜토리얼",
 };
 
 export const STATUS_LABELS: Record<CurriculumStatus, string> = {

@@ -5,6 +5,12 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { AuthLoading } from "@/components/auth/AuthLoading";
 import { Logo } from "@/components/layout";
 import { Button } from "@/components/ui/button";
+import { useGraphLayout, useZoomPan } from "@/hooks";
+import { dummyCurriculumGraph } from "@/lib/dummy-curriculum-2";
+import { CurriculumNode } from "@/lib/types";
+import GraphCanvasNew from "./_components/GraphCanvasNew";
+import { useRouter } from "next/navigation";
+import { useAuth } from "../../../lib/auth-context";
 import { useAuthGuard, useGraphLayout, useZoomPan } from "@/hooks";
 import { curriculumApi } from "@/lib/api";
 import { CurriculumGraph, CurriculumNode } from "@/lib/types";
@@ -12,7 +18,6 @@ import { useParams, useRouter } from "next/navigation";
 import { GraphCanvas } from "./_components/GraphCanvas";
 import { GraphSidebar } from "./_components/GraphSidebar";
 import { MilestoneBar } from "./_components/MilestoneBar";
-import { ZoomControls } from "./_components/ZoomControls";
 
 /**
  * 커리큘럼 그래프 페이지
@@ -75,6 +80,7 @@ export default function CurriculumGraphPage() {
   const { positions: nodePositions, sortedNodeIds } = useGraphLayout(
     graph?.nodes ?? [],
     graph?.edges ?? []
+    graph.meta.paper_id
   );
 
   // 줌/팬 상태 (커스텀 훅)
@@ -96,13 +102,14 @@ export default function CurriculumGraphPage() {
   const importantNodes = useMemo(() => {
     const orderMap = new Map(sortedNodeIds.map((id, index) => [id, index]));
     return (graph?.nodes ?? [])
-      .filter(n => n.importance >= 7)
-      .sort((a, b) => {
-        const orderA = orderMap.get(a.keyword_id) ?? 999;
-        const orderB = orderMap.get(b.keyword_id) ?? 999;
-        return orderA - orderB;
-      });
+      .filter(n => n.importance >= 7);
   }, [graph?.nodes, sortedNodeIds]);
+
+  const firstNodes: CurriculumNode[] = useMemo(() => {
+    return graph.first_node_order
+      .map(id => graph.nodes.find(n => n.keyword_id === id))
+      .filter((n): n is CurriculumNode => n !== undefined); // undefined 제거
+  }, [graph.nodes, graph.first_node_order]);
 
   // 노드 선택 핸들러 (5.9 Use Functional setState - useCallback으로 안정적인 참조)
   const handleNodeSelect = useCallback((node: CurriculumNode) => {
@@ -196,18 +203,12 @@ export default function CurriculumGraphPage() {
         />
 
         {/* Graph Area */}
-        <section className='flex-1 flex flex-col relative bg-[#f8fafc] overflow-hidden'>
-          {/* Zoom Controls */}
-          <ZoomControls
-            onZoomIn={zoomIn}
-            onZoomOut={zoomOut}
-            onReset={resetView}
-          />
-
+        <section className='flex-1 flex flex-col bg-[#f8fafc]'>
           {/* SVG Graph Canvas */}
-          <GraphCanvas
+          <GraphCanvasNew
             nodes={graph.nodes}
             edges={graph.edges}
+            paperId={graph.meta.paper_id}
             nodePositions={nodePositions}
             selectedNodeId={selectedNode?.keyword_id ?? null}
             viewBox={viewBox}
@@ -221,7 +222,7 @@ export default function CurriculumGraphPage() {
 
           {/* Bottom Milestone Bar */}
           <MilestoneBar
-            nodes={importantNodes}
+            nodes={firstNodes}
             nodePositions={nodePositions}
             selectedNodeId={selectedNode?.keyword_id ?? null}
             zoom={zoom}

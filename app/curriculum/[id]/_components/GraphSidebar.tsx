@@ -2,8 +2,11 @@
 
 import { Badge } from "@/components/ui/badge";
 import { CurriculumNode } from "@/lib/types";
-import { memo } from "react";
-import { RESOURCE_TYPE_ICONS } from "../../../../const/resourceType";
+import { memo, useState } from "react";
+import {
+  RESOURCE_TYPE_ICONS,
+  RESOURCE_TYPE_LABELS,
+} from "../../../../const/resourceType";
 
 interface GraphSidebarProps {
   selectedNode: CurriculumNode | null;
@@ -28,6 +31,10 @@ export const GraphSidebar = memo(function GraphSidebar({
   selectedNode,
   importantNodes,
 }: GraphSidebarProps) {
+  const [selectedResourceId, setSelectedResourceId] = useState<string | null>(
+    selectedNode?.resources?.[0]?.resource_id ?? null
+  );
+
   if (!selectedNode) {
     return (
       <aside className='w-100 bg-white border-r border-slate-200 flex flex-col shrink-0 z-20 h-full shadow-xl shadow-slate-200/50'>
@@ -42,6 +49,10 @@ export const GraphSidebar = memo(function GraphSidebar({
     n => n.keyword_id === selectedNode.keyword_id
   );
 
+  const selectedResource = selectedNode.resources.find(
+    r => r.resource_id === selectedResourceId
+  );
+
   return (
     <aside className='w-100 bg-white border-r border-slate-200 flex flex-col shrink-0 z-20 h-full shadow-xl shadow-slate-200/50'>
       <div className='flex-1 overflow-y-auto p-6 custom-scrollbar'>
@@ -49,9 +60,6 @@ export const GraphSidebar = memo(function GraphSidebar({
           {/* 1. Header Section */}
           <div className='space-y-4'>
             <div className='inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg border border-blue-100'>
-              <span className='w-6 h-6 rounded-md bg-blue-600 text-white text-[10px] font-bold flex items-center justify-center shadow-sm'>
-                {nodeIndex >= 0 ? nodeIndex + 1 : "•"}
-              </span>
               <span className='text-xs font-bold uppercase tracking-wide'>
                 Current Concept
               </span>
@@ -61,6 +69,25 @@ export const GraphSidebar = memo(function GraphSidebar({
               <h2 className='text-2xl font-black text-slate-900 mb-2 leading-tight'>
                 {selectedNode.keyword}
               </h2>
+              <div className='bg-accent/10 rounded-2xl inline-flex flex-wrap items-center gap-2 px-2 py-1 my-1'>
+                <span className='flex items-center gap-1'>
+                  <span
+                    className={`
+                    material-symbols-outlined text-accent
+                  `}
+                    style={{ fontSize: "18px" }}
+                  >
+                    star
+                  </span>
+                  <span
+                    className={`
+                    text-xs font-semibold text-accent
+                  `}
+                  >
+                    {selectedNode.keyword_importance}
+                  </span>
+                </span>
+              </div>
               <p className='text-sm text-slate-600 leading-relaxed font-medium'>
                 {selectedNode.description}
               </p>
@@ -77,7 +104,7 @@ export const GraphSidebar = memo(function GraphSidebar({
               </h3>
               <Badge
                 variant='outline'
-                className='text-xs font-normal text-slate-500'
+                className='text-xs font-normal text-blue-600 bg-blue-200/50 border-blue-600'
               >
                 {selectedNode.resources.length} items
               </Badge>
@@ -87,7 +114,12 @@ export const GraphSidebar = memo(function GraphSidebar({
               {selectedNode.resources.map(resource => (
                 <div
                   key={resource.resource_id}
-                  className='bg-white rounded-xl border border-slate-200 p-4 hover:border-blue-300 hover:shadow-md transition-all group'
+                  onClick={() => setSelectedResourceId(resource.resource_id)}
+                  className={`rounded-xl border p-4 transition-all group cursor-pointer ${
+                    selectedResourceId === resource.resource_id
+                      ? "bg-blue-50/50 border-blue-400 shadow-sm"
+                      : "bg-white border-slate-200 hover:border-blue-300 hover:shadow-md"
+                  }`}
                 >
                   <div className='flex items-start gap-3 mb-3'>
                     <div className='w-10 h-10 rounded-lg bg-slate-50 group-hover:bg-blue-50 flex items-center justify-center shrink-0 transition-colors'>
@@ -100,14 +132,14 @@ export const GraphSidebar = memo(function GraphSidebar({
                         <span className='text-[10px] font-bold text-slate-400 uppercase tracking-wider'>
                           {resource.type}
                         </span>
-                        {resource.is_core && (
+                        {resource.is_necessary && (
                           <span className='text-[9px] font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded'>
                             CORE
                           </span>
                         )}
                       </div>
                       <h4 className='text-sm font-bold text-slate-800 leading-snug'>
-                        {resource.name}
+                        {resource.resource_name}
                       </h4>
                     </div>
                   </div>
@@ -132,7 +164,7 @@ export const GraphSidebar = memo(function GraphSidebar({
                     </div>
                     <div className='text-center border-l border-slate-200'>
                       <div className='text-xs font-bold text-slate-700'>
-                        {resource.study_load_minutes}m
+                        {resource.study_load}h
                       </div>
                       <div className='text-[9px] text-slate-400 uppercase'>
                         Time
@@ -157,36 +189,23 @@ export const GraphSidebar = memo(function GraphSidebar({
               ))}
             </div>
           </div>
-
-          {/* 3. Foundational Context (Bottom) */}
-          {selectedNode.resources[0]?.is_core && (
-            <div className='mt-8 pt-6 border-t border-slate-100'>
-              <div className='bg-slate-900 rounded-xl p-5 text-white'>
+          {selectedResource && (
+            <div className='my-3 pt-6 border-t border-slate-100'>
+              <div className='bg-slate-900 rounded-xl px-5 py-4 text-white'>
                 <div className='flex items-center gap-2 mb-3'>
-                  <span className='material-symbols-outlined text-amber-400'>
+                  <span
+                    className='material-symbols-outlined text-amber-400'
+                    style={{ fontSize: "20px" }}
+                  >
                     lightbulb
                   </span>
-                  <span className='font-bold text-sm'>Foundational Origin</span>
+                  <span className='font-bold text-sm'>
+                    About this {RESOURCE_TYPE_LABELS[selectedResource.type]}
+                  </span>
                 </div>
-                <p className='text-xs text-slate-300 leading-relaxed mb-4'>
-                  This concept serves as a critical building block.
-                  Understanding &quot;{selectedNode.keyword}&quot; is essential
-                  before proceeding to advanced topics.
+                <p className='text-xs text-slate-300 leading-relaxed'>
+                  {selectedResource.resource_description}
                 </p>
-
-                {selectedNode.resources[0]?.url && (
-                  <a
-                    href={selectedNode.resources[0].url}
-                    target='_blank'
-                    rel='noopener noreferrer'
-                    className='flex items-center gap-2 text-xs font-medium text-blue-300 hover:text-white transition-colors'
-                  >
-                    <span className='material-symbols-outlined text-sm'>
-                      link
-                    </span>
-                    <span>Source Material</span>
-                  </a>
-                )}
               </div>
             </div>
           )}
