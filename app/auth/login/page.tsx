@@ -27,7 +27,18 @@ export default function LoginPage() {
         await login(email, password);
         router.push("/user/history");
       } catch (err) {
-        setError(err instanceof Error ? err.message : "로그인에 실패했습니다.");
+        if (
+          err &&
+          typeof err === "object" &&
+          "status" in err &&
+          (err as { status?: number }).status === 422
+        ) {
+          setError("이메일 또는 비밀번호를 다시 확인해주세요.");
+        } else {
+          setError(
+            err instanceof Error ? err.message : "로그인에 실패했습니다."
+          );
+        }
       } finally {
         setIsLoading(false);
       }

@@ -1,9 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
+import { AuthLoading } from "@/components/auth/AuthLoading";
 import { Logo } from "@/components/layout";
+import { useAuthGuard } from "@/hooks";
+import { curriculumApi } from "@/lib/api";
 import { useCurriculum } from "@/lib/curriculum-context";
 import { LOADING_STEPS } from "../../../const/loadingStep";
 import LoadingIndicator from "./_component/LoadingIndicator";
@@ -14,51 +17,145 @@ import PaperInfoCard from "./_component/PaperInfoCard";
  * 커리큘럼 생성 로딩 페이지
  */
 export default function GeneratingPage() {
+  const { isAuthenticated, isLoading: authLoading } = useAuthGuard();
   const router = useRouter();
   const { state, completeGeneration } = useCurriculum();
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [progress, setProgress] = useState(0);
+  const [statusText, setStatusText] = useState<string | null>(null);
+  const [hasStartedPolling, setHasStartedPolling] = useState(false);
+  const [pollError, setPollError] = useState<string | null>(null);
+  const [isReady, setIsReady] = useState(false);
+  const startTimeRef = useRef<number | null>(null);
+  const progressFloatRef = useRef(0);
+  const lastTickRef = useRef<number | null>(null);
 
   useEffect(() => {
+    if (!isAuthenticated) return;
     // 커리큘럼 ID가 없으면 업로드 페이지로
     if (!state.curriculumId) {
       router.push("/curriculum/upload-paper");
       return;
     }
 
-    // Mock: 진행률 애니메이션 (5.9 Use Functional setState)
+    startTimeRef.current = Date.now();
+    lastTickRef.current = Date.now();
+    progressFloatRef.current = 0;
+
     const progressInterval = setInterval(() => {
+      if (!startTimeRef.current || isReady || pollError) return;
+      const now = Date.now();
+      const elapsedSec = (now - startTimeRef.current) / 1000;
+      const deltaSec = lastTickRef.current
+        ? (now - lastTickRef.current) / 1000
+        : 0;
+      lastTickRef.current = now;
+
+      if (elapsedSec >= 180) {
+        setPollError("생성 시간이 초과되었습니다. 잠시 후 다시 시도해주세요.");
+        return;
+      }
+
+      let ratePerSec = 0;
+      if (elapsedSec <= 60) {
+        ratePerSec = 1.5; // 0 -> 90 in 60s
+      } else if (elapsedSec <= 160) {
+        ratePerSec = 1 / 20; // 90 -> 95 in 100s
+      } else {
+        ratePerSec = 1 / 30; // 95 -> 99 in 120s
+      }
+
+      progressFloatRef.current = Math.min(
+        99,
+        progressFloatRef.current + ratePerSec * deltaSec
+      );
+
       setProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(progressInterval);
-          return 100;
-        }
-        return prev + 2;
+        const target = Math.floor(progressFloatRef.current);
+        if (target <= prev) return prev;
+        return Math.min(prev + 1, target);
       });
-    }, 100);
+    }, 200);
 
     const stepInterval = setInterval(() => {
-      setCurrentStepIndex(prev => {
-        if (prev >= LOADING_STEPS.length - 1) {
-          clearInterval(stepInterval);
-          return prev;
-        }
-        return prev + 1;
-      });
-    }, 1000);
-
-    // Mock: 5초 후 완료
-    const completeTimeout = setTimeout(() => {
-      completeGeneration();
-      router.push(`/curriculum/${state.curriculumId}`);
+      setCurrentStepIndex(prev =>
+        prev >= LOADING_STEPS.length - 1 ? 0 : prev + 1
+      );
     }, 5000);
+    setHasStartedPolling(true);
 
     return () => {
       clearInterval(progressInterval);
       clearInterval(stepInterval);
-      clearTimeout(completeTimeout);
     };
-  }, [state.curriculumId, router, completeGeneration]);
+  }, [isAuthenticated, state.curriculumId, isReady, pollError]);
+
+  useEffect(() => {
+    if (!isAuthenticated || !state.curriculumId || !hasStartedPolling) return;
+
+    let isActive = true;
+    const poll = async () => {
+      if (pollError) return;
+      try {
+        const response = await curriculumApi.checkStatus(state.curriculumId);
+        if (!isActive) return;
+
+        if (response.current_step) {
+          setStatusText(response.current_step);
+        }
+
+        if (response.status === "ready") {
+          setIsReady(true);
+        } else if (response.status === "failed") {
+          setPollError("커리큘럼 생성에 실패했습니다.");
+        }
+      } catch (err) {
+        if (!isActive) return;
+        setPollError(
+          err instanceof Error
+            ? err.message
+            : "생성 상태 확인에 실패했습니다."
+        );
+      }
+    };
+
+    poll();
+    const pollInterval = setInterval(poll, 8000);
+
+    return () => {
+      isActive = false;
+      clearInterval(pollInterval);
+    };
+  }, [
+    isAuthenticated,
+    state.curriculumId,
+    hasStartedPolling,
+    pollError,
+    completeGeneration,
+    router,
+  ]);
+
+  useEffect(() => {
+    if (!isReady || !state.curriculumId) return;
+
+    const fillInterval = setInterval(() => {
+      setProgress(prev => {
+        const next = Math.min(100, prev + 5);
+        if (next >= 100) {
+          clearInterval(fillInterval);
+          completeGeneration();
+          router.push(`/curriculum/${state.curriculumId}`);
+        }
+        return next;
+      });
+    }, 100);
+
+    return () => clearInterval(fillInterval);
+  }, [isReady, state.curriculumId, completeGeneration, router]);
+
+  if (authLoading || !isAuthenticated) {
+    return <AuthLoading />;
+  }
 
   return (
     <div className='min-h-screen flex flex-col items-center justify-center bg-linear-to-br from-secondary/20 via-background to-primary/10 relative overflow-hidden'>
@@ -89,7 +186,11 @@ export default function GeneratingPage() {
           커리큘럼 생성 중
         </h2>
         <p className='text-sm text-muted-foreground mb-8'>
-          {LOADING_STEPS[currentStepIndex]?.label || "잠시만 기다려주세요..."}
+          {pollError
+            ? pollError
+            : statusText ||
+              LOADING_STEPS[currentStepIndex]?.label ||
+              "잠시만 기다려주세요..."}
         </p>
 
         {/* Step indicators */}

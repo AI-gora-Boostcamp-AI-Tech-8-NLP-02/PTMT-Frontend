@@ -1,6 +1,8 @@
 "use client";
 
+import { AuthLoading } from "@/components/auth/AuthLoading";
 import { Header } from "@/components/layout";
+import { useAuthGuard } from "@/hooks";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import UploadTabs from "./_components/UploadTabs";
@@ -9,6 +11,7 @@ import UploadTabs from "./_components/UploadTabs";
  * 논문 업로드 페이지
  */
 export default function UploadPaperPage() {
+  const { isAuthenticated, isLoading: authLoading } = useAuthGuard();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("pdf");
   const [error, setError] = useState<string | null>(null);
@@ -16,6 +19,10 @@ export default function UploadPaperPage() {
   const handleBack = useCallback(() => {
     router.back();
   }, [router]);
+
+  if (authLoading || !isAuthenticated) {
+    return <AuthLoading />;
+  }
 
   return (
     <div className='min-h-screen flex flex-col bg-background'>
