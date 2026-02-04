@@ -202,7 +202,7 @@ export function useGraphLayout(
     finalLayers.forEach((layer, layerIdx) => {
       // 레이어 내 노드 수에 따라 Y축 분산 범위 동적 계산
       const nodeCount = layer.length;
-      const ySpread = Math.max(1000, nodeCount * NODE_HEIGHT * 1.25);
+      const ySpread = Math.max(1000, nodeCount * NODE_HEIGHT * 1.2);
 
       const layerBaseX = layerIdx * LAYER_X_GAP + 100;
 

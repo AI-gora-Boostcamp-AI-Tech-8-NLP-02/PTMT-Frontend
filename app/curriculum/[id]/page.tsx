@@ -194,7 +194,7 @@ export default function CurriculumGraphPage() {
         />
 
         {/* Graph Area */}
-        <section className='flex-1 flex flex-col bg-[#f8fafc]'>
+        <section className='flex-1 flex flex-col bg-[#f8fafc] min-w-0'>
           {/* SVG Graph Canvas */}
           <GraphCanvas
             nodes={graph.nodes}
