@@ -27,17 +27,20 @@ export function useGraphLayout(
 
     // 1️⃣ 방향성 그래프 생성 (Adjacency List & In-Degree)
     const adj: Record<string, string[]> = {};
+    const reverseAdj: Record<string, string[]> = {};
     const inDegree: Record<string, number> = {};
     const nodeIds = nodes.map(n => n.keyword_id);
 
     nodeIds.forEach(id => {
       adj[id] = [];
+      reverseAdj[id] = [];
       inDegree[id] = 0;
     });
 
     edges.forEach(edge => {
       if (adj[edge.start_keyword_id] && adj[edge.end_keyword_id]) {
         adj[edge.start_keyword_id].push(edge.end_keyword_id);
+        reverseAdj[edge.end_keyword_id].push(edge.start_keyword_id);
         inDegree[edge.end_keyword_id]++;
       }
     });
@@ -93,7 +96,57 @@ export function useGraphLayout(
     }
 
     // 빈 레이어 제거
-    const finalLayers = layers.filter(layer => layer.length > 0);
+    const initialLayers = layers.filter(layer => layer.length > 0);
+
+    // 2.5️⃣ Layer Promotion: 자식 노드와의 간격을 줄이기 위해 노드를 뒤쪽 레이어로 이동
+    // (Out-Degree를 고려하여 가능한 한 자식 노드에 가깝게 배치)
+    const nodeLayerMap: Record<string, number> = {};
+    initialLayers.forEach((layer, idx) => {
+      layer.forEach(nodeId => {
+        nodeLayerMap[nodeId] = idx;
+      });
+    });
+
+    // 역순으로 순회하며 자식 노드에 가깝게 레이어 이동
+    for (let i = initialLayers.length - 2; i >= 0; i--) {
+      const layerNodes = initialLayers[i];
+      layerNodes.forEach(nodeId => {
+        if (nodeId === paperId) return; // paperId는 이동하지 않음
+
+        const children = adj[nodeId] || [];
+        if (children.length === 0) return;
+
+        let minChildLayer = Infinity;
+        let hasValidChild = false;
+
+        children.forEach(childId => {
+          // 자식 노드가 현재 레이아웃 대상에 포함되어 있는지 확인
+          if (nodeLayerMap[childId] !== undefined) {
+            minChildLayer = Math.min(minChildLayer, nodeLayerMap[childId]);
+            hasValidChild = true;
+          }
+        });
+
+        if (hasValidChild && minChildLayer !== Infinity) {
+          // 자식 바로 앞 레이어로 이동 (현재 레이어보다 뒤쪽일 경우에만)
+          const targetLayer = minChildLayer - 1;
+          if (targetLayer > nodeLayerMap[nodeId]) {
+            nodeLayerMap[nodeId] = targetLayer;
+          }
+        }
+      });
+    }
+
+    // 재구성된 레이어 배열 생성
+    const promotedLayers: string[][] = [];
+    Object.entries(nodeLayerMap).forEach(([nodeId, layerIdx]) => {
+      if (!promotedLayers[layerIdx]) promotedLayers[layerIdx] = [];
+      promotedLayers[layerIdx].push(nodeId);
+    });
+
+    const finalLayers = promotedLayers.filter(
+      layer => layer && layer.length > 0
+    );
 
     // paperId를 기반으로 고정된 시드를 생성하여 랜덤성을 제어
     const createSeedFromString = (str: string): number => {
@@ -119,12 +172,12 @@ export function useGraphLayout(
     const positions: Record<string, NodePosition> = {};
 
     // 노드 크기 설정 (260px + 여유 공간)
-    const NODE_WIDTH = 500;
+    const NODE_WIDTH = 700;
     const NODE_HEIGHT = 320;
 
     // 레이어 간 간격 및 랜덤 범위
-    const LAYER_X_GAP = 800;
-    const LAYER_X_JITTER = 600; // 레이어 중심 기준 좌우 랜덤 범위
+    const LAYER_X_GAP = 1500;
+    const LAYER_X_JITTER = 750; // 레이어 중심 기준 좌우 랜덤 범위
 
     const CANVAS_CENTER_Y = 400;
 
@@ -153,9 +206,27 @@ export function useGraphLayout(
 
       const layerBaseX = layerIdx * LAYER_X_GAP + 100;
 
+      // 부모 노드들의 위치를 기반으로 정렬 (Edge Crossing 최소화)
+      const preferredY: Record<string, number> = {};
+      layer.forEach(nodeId => {
+        const parents = reverseAdj[nodeId] || [];
+        let sumY = 0;
+        let count = 0;
+        parents.forEach(pid => {
+          if (positions[pid]) {
+            sumY += positions[pid].y;
+            count++;
+          }
+        });
+        preferredY[nodeId] = count > 0 ? sumY / count : CANVAS_CENTER_Y;
+      });
+
+      // Y좌표 기준 정렬
+      layer.sort((a, b) => preferredY[a] - preferredY[b]);
+
       layer.forEach(nodeId => {
         let bestX = layerBaseX;
-        let bestY = CANVAS_CENTER_Y;
+        let bestY = preferredY[nodeId];
         let placed = false;
 
         // 1. 랜덤 위치 시도 (최대 100회)
@@ -164,7 +235,7 @@ export function useGraphLayout(
           const yOffset = (random() - 0.5) * ySpread;
 
           const x = layerBaseX + xOffset;
-          const y = CANVAS_CENTER_Y + yOffset;
+          const y = bestY + yOffset;
 
           if (!checkCollision(x, y, positions)) {
             bestX = x;
@@ -183,10 +254,10 @@ export function useGraphLayout(
           // 레이어 X축 범위 내에서 약간의 변동을 주며 Y축 탐색
           for (let i = 1; i <= searchLimit; i++) {
             // 위아래 번갈아가며 탐색: 0, 1, -1, 2, -2 ...
-            const sign = i % 2 === 0 ? 1 : -1;
+            const sign = i % 2 === 0 ? -1 : 1;
             const step = Math.ceil(i / 2);
 
-            const y = CANVAS_CENTER_Y + sign * step * (NODE_HEIGHT * 0.8);
+            const y = bestY + sign * step * (NODE_HEIGHT * 1.25);
             // X축은 레이어 중심에서 약간 랜덤하게
             const x = layerBaseX + (random() - 0.5) * LAYER_X_JITTER;
 
@@ -201,7 +272,7 @@ export function useGraphLayout(
           // 그래도 못 찾으면 그냥 겹치더라도 배치 (무한 루프 방지)
           if (!found) {
             bestX = layerBaseX + (random() - 0.5) * 50;
-            bestY = CANVAS_CENTER_Y + Object.keys(positions).length * 10; // 살짝 아래로
+            bestY = bestY + Object.keys(positions).length * 10; // 살짝 아래로
           }
         }
 

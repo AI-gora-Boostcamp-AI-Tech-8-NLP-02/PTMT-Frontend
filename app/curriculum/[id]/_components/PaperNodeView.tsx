@@ -20,7 +20,7 @@ export function PaperNodeView({ data, selected }: Props) {
       )}
       <div
         className={`
-        relative w-180 h-70 rounded-full border bg-white px-5 py-20
+        relative w-180 h-70 rounded-full border bg-white px-8 py-20
         shadow-md transition-all duration-300 flex flex-col items-center justify-center text-center
         ${
           selected
@@ -40,7 +40,7 @@ export function PaperNodeView({ data, selected }: Props) {
 
         <div>
           {/* title */}
-          <h3 className='text-3xl font-bold text-slate-800 leading-snug mb-3 line-clamp-2'>
+          <h3 className='text-6xl font-bold text-slate-800 leading-snug mb-3 line-clamp-2'>
             {keyword}
           </h3>
         </div>
