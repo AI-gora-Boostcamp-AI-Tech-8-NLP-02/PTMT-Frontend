@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { memo } from "react";
 
@@ -47,13 +48,8 @@ export const Logo = memo(function Logo({
     <Link href='/' className={`flex items-center gap-3 group ${className}`}>
       {/* Logo Icon - 3D effect */}
       <div className={`${sizes.icon} relative`}>
-        <div className='absolute inset-0 bg-linear-to-br from-primary to-accent rounded-2xl transform rotate-6 opacity-60 group-hover:rotate-12 transition-transform' />
-        <div className='absolute inset-0 bg-linear-to-br from-primary to-primary/80 rounded-2xl flex items-center justify-center shadow-lg group-hover:-translate-y-0.5 transition-transform'>
-          <span
-            className={`material-symbols-outlined icon-filled ${sizes.iconText} text-primary-foreground`}
-          >
-            school
-          </span>
+        <div className='absolute inset-0 bg-yellow-50 rounded-2xl flex items-center justify-center shadow-lg group-hover:-translate-y-0.5 transition-transform'>
+          <Image src='/logo.svg' alt='graph' fill />
         </div>
       </div>
       <div className='flex flex-col'>
