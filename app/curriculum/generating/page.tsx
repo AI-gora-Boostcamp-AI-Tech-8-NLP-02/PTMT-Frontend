@@ -53,6 +53,11 @@ export default function GeneratingPage() {
 
       if (elapsedSec >= 180) {
         setPollError("생성 시간이 초과되었습니다. 잠시 후 다시 시도해주세요.");
+
+        alert("생성 시간이 초과되었습니다.\n잠시 후 다시 시도해주세요.");
+
+        router.push("/curriculum/upload-paper");
+
         return;
       }
 
