@@ -2,6 +2,7 @@
 
 import { Keyword } from "@/lib/types";
 import { memo, useCallback } from "react";
+import { InfoTooltip } from "./InfoTooltip";
 
 // 6.3 Hoist Static JSX
 const emptyState = (
@@ -41,8 +42,22 @@ export const KnownConceptsSection = memo(function KnownConceptsSection({
             psychology
           </span>
         </div>
-        <div>
+        <div className='flex items-center gap-2'>
           <h2 className='text-lg font-bold'>2. 이미 알고 있는 개념</h2>
+          <InfoTooltip
+            content={
+              <span className='space-y-1'>
+                <span className='block'>이미 이해하고 있는 개념을 입력하세요.</span>
+                <span className='block'>
+                  입력한 개념은 커리큘럼의{" "}
+                  <strong className='font-semibold text-slate-800'>
+                    필수 학습 키워드에서 제외됩니다
+                  </strong>
+                  .
+                </span>
+              </span>
+            }
+          />
         </div>
       </div>
       <p className='text-sm text-slate-500 mb-5 ml-13'>

@@ -2,6 +2,7 @@
 
 import { UserLevel } from "@/lib/types";
 import { memo } from "react";
+import { InfoTooltip } from "./InfoTooltip";
 
 // 6.3 Hoist Static JSX
 const LEVELS = [
@@ -27,7 +28,21 @@ export const LevelSection = memo(function LevelSection({
             school
           </span>
         </div>
-        <h2 className='text-lg font-bold'>1. 학습 수준</h2>
+        <div className='flex items-center gap-2'>
+          <h2 className='text-lg font-bold'>1. 학습 수준</h2>
+          <InfoTooltip
+            content={
+              <span>
+                AI 도메인에 대한 배경지식 수준을 의미하며, 선택한 수준에 따라
+                기초 개념부터 논문에 직접 등장하는 세부 개념까지{" "}
+                <strong className='font-semibold text-slate-800'>
+                  다루는 키워드의 수준과 그래프 깊이가 달라집니다
+                </strong>
+                .
+              </span>
+            }
+          />
+        </div>
       </div>
       <div className='grid gap-3 sm:grid-cols-3'>
         {LEVELS.map(l => (
