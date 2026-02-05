@@ -29,6 +29,8 @@ export default function GeneratingPage() {
   const progressFloatRef = useRef(0);
   const lastTickRef = useRef<number | null>(null);
   const hasFailedRef = useRef(false);
+  const hasCompletedRef = useRef(false);
+  const fillIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -134,20 +136,35 @@ export default function GeneratingPage() {
   useEffect(() => {
     if (!isReady || !state.curriculumId) return;
 
-    const fillInterval = setInterval(() => {
-      setProgress(prev => {
-        const next = Math.min(100, prev + 5);
-        if (next >= 100) {
-          clearInterval(fillInterval);
-          completeGeneration();
-          router.push(`/curriculum/${state.curriculumId}`);
-        }
-        return next;
-      });
+    if (fillIntervalRef.current) {
+      clearInterval(fillIntervalRef.current);
+    }
+
+    fillIntervalRef.current = setInterval(() => {
+      setProgress(prev => Math.min(100, prev + 5));
     }, 100);
 
-    return () => clearInterval(fillInterval);
-  }, [isReady, state.curriculumId, completeGeneration, router]);
+    return () => {
+      if (fillIntervalRef.current) {
+        clearInterval(fillIntervalRef.current);
+        fillIntervalRef.current = null;
+      }
+    };
+  }, [isReady, state.curriculumId]);
+
+  useEffect(() => {
+    if (!isReady || !state.curriculumId) return;
+    if (progress < 100) return;
+    if (hasCompletedRef.current) return;
+
+    hasCompletedRef.current = true;
+    if (fillIntervalRef.current) {
+      clearInterval(fillIntervalRef.current);
+      fillIntervalRef.current = null;
+    }
+    completeGeneration();
+    router.push(`/curriculum/${state.curriculumId}`);
+  }, [progress, isReady, state.curriculumId, completeGeneration, router]);
 
   if (authLoading || !isAuthenticated) {
     return <AuthLoading />;
