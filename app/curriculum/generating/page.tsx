@@ -28,6 +28,7 @@ export default function GeneratingPage() {
   const startTimeRef = useRef<number | null>(null);
   const progressFloatRef = useRef(0);
   const lastTickRef = useRef<number | null>(null);
+  const hasFailedRef = useRef(false);
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -105,7 +106,11 @@ export default function GeneratingPage() {
         if (response.status === "ready") {
           setIsReady(true);
         } else if (response.status === "failed") {
-          setPollError("커리큘큘럼 생성에 실패했습니다.");
+          if (hasFailedRef.current) return;
+          hasFailedRef.current = true;
+          setPollError("커리큘럼 생성에 실패했습니다. 다시 시도해주세요.");
+          alert("커리큘럼 생성에 실패했습니다.\n다시 시도해주세요.");
+          router.push("/curriculum/upload-paper");
         }
       } catch (err) {
         if (!isActive) return;
