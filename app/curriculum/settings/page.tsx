@@ -128,7 +128,7 @@ export default function CurriculumSettingsPage() {
       <Header />
 
       <main className='flex-1 py-10 px-6'>
-        <div className='max-w-225 mx-auto'>
+        <div className='max-w-6xl mx-auto'>
           {/* Header */}
           <div className='mb-10'>
             <h1 className='text-3xl md:text-4xl font-black tracking-tight mb-2'>
