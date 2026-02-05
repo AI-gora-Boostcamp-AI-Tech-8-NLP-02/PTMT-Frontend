@@ -3,6 +3,7 @@
 import { CurriculumNode } from "@/lib/types";
 import { memo, useCallback } from "react";
 import { RESOURCE_TYPE_ICONS } from "../../../../const/resourceType";
+import { InfoTooltip } from "../../settings/_components/InfoTooltip";
 
 interface NodePosition {
   x: number;
@@ -41,6 +42,13 @@ export const MilestoneBar = memo(function MilestoneBar({
             stars
           </span>
           <h3 className='font-bold text-slate-800 text-lg'>Starting Points</h3>
+          <InfoTooltip
+            content={
+              <span>
+                학습의 순서를 추천해드립니다. 순서대로 학습해보세요!
+              </span>
+            }
+          />
         </div>
         <span className='text-xs font-medium text-slate-400 bg-slate-50 px-3 py-1 rounded-full'>
           The Recommended Sequence
