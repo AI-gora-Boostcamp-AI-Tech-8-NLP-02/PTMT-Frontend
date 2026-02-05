@@ -97,12 +97,29 @@ const MonthlyHeatmap = memo(function MonthlyHeatmap({
   }, [startDate]);
 
   const cells = useMemo(() => {
-    const result: Array<{ date: Date; count: number }> = [];
+    const grid: Array<Array<{ date: Date | null; count: number }>> = Array.from(
+      { length: WEEKS },
+      () => Array.from({ length: 7 }, () => ({ date: null, count: 0 }))
+    );
+
     for (let i = 0; i < totalDays; i += 1) {
       const date = new Date(startDate);
       date.setDate(startDate.getDate() + i);
+      const weekIndex = Math.floor(i / 7);
+      if (weekIndex >= WEEKS) break;
+      const dayIndex = date.getDay();
       const key = toKey(date.getFullYear(), date.getMonth(), date.getDate());
-      result.push({ date, count: activityByDate[key] || 0 });
+      grid[weekIndex][dayIndex] = {
+        date,
+        count: activityByDate[key] || 0,
+      };
+    }
+
+    const result: Array<{ date: Date | null; count: number }> = [];
+    for (let week = 0; week < WEEKS; week += 1) {
+      for (let day = 0; day < 7; day += 1) {
+        result.push(grid[week][day]);
+      }
     }
     return result;
   }, [activityByDate, startDate, totalDays]);
@@ -171,30 +188,36 @@ const MonthlyHeatmap = memo(function MonthlyHeatmap({
               ))}
             </div>
 
-            <div
-              className='grid'
-              style={{
-                gridTemplateColumns: `repeat(${WEEKS}, ${TARGET_CELL}px)`,
-                gridTemplateRows: `repeat(7, ${TARGET_CELL}px)`,
-                columnGap: `${CELL_GAP}px`,
-                rowGap: `${CELL_GAP}px`,
-              }}
-            >
-              {isLoading
-                ? Array.from({ length: totalDays }).map((_, index) => (
-                    <div
-                      key={index}
-                      className='rounded-[3px] bg-slate-100 animate-pulse'
-                    />
-                  ))
-                : cells.map((cell, index) => {
-                    const level = levelFor(cell.count, maxCount);
-                    const label = `${cell.date.getFullYear()}.${String(
-                      cell.date.getMonth() + 1
-                    ).padStart(2, "0")}.${String(cell.date.getDate()).padStart(
-                      2,
-                      "0"
-                    )}`;
+        <div
+          className='grid'
+          style={{
+            gridTemplateColumns: `repeat(${WEEKS}, ${TARGET_CELL}px)`,
+            gridTemplateRows: `repeat(7, ${TARGET_CELL}px)`,
+            columnGap: `${CELL_GAP}px`,
+            rowGap: `${CELL_GAP}px`,
+            gridAutoFlow: "column",
+          }}
+        >
+          {isLoading
+            ? Array.from({ length: totalDays }).map((_, index) => (
+                <div
+                  key={index}
+                  className='rounded-[3px] bg-slate-100 animate-pulse'
+                />
+              ))
+            : cells.map((cell, index) => {
+                if (!cell.date) {
+                  return (
+                    <div key={index} className='rounded-[3px] bg-transparent' />
+                  );
+                }
+                const level = levelFor(cell.count, maxCount);
+                const label = `${cell.date.getFullYear()}.${String(
+                  cell.date.getMonth() + 1
+                ).padStart(2, "0")}.${String(cell.date.getDate()).padStart(
+                  2,
+                  "0"
+                )}`;
                     return (
                       <div
                         key={index}

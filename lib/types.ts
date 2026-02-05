@@ -222,9 +222,9 @@ export const LEVEL_LABELS: Record<UserLevel, string> = {
 };
 
 export const RESOURCE_TYPE_LABELS: Record<ResourceType, string> = {
-  paper: "원문 논문",
-  web_doc: "블로그/아티클",
-  video: "영상 강의",
+  paper: "논문",
+  web_doc: "웹",
+  video: "영상",
 };
 
 export const STATUS_LABELS: Record<CurriculumStatus, string> = {
