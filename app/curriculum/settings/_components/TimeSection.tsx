@@ -24,7 +24,7 @@ export const TimeSection = memo(function TimeSection({
             schedule
           </span>
         </div>
-        <h2 className="text-lg font-bold">4. 목표 투자 시간</h2>
+        <h2 className="text-lg font-bold">3. 목표 투자 시간</h2>
       </div>
       <div className="space-y-4">
         <div>

@@ -12,7 +12,6 @@ import { useCurriculum } from "@/lib/curriculum-context";
 import { CurriculumPurpose, ResourceType, UserLevel } from "@/lib/types";
 import { KnownConceptsSection } from "./_components/KnownConceptsSection";
 import { LevelSection } from "./_components/LevelSection";
-import { PurposeSection } from "./_components/PurposeSection";
 import { ResourcesSection } from "./_components/ResourcesSection";
 import { TimeSection } from "./_components/TimeSection";
 
@@ -25,7 +24,7 @@ export default function CurriculumSettingsPage() {
   const { state, setOptions, startGeneration } = useCurriculum();
 
   // State
-  const [purpose, setPurpose] = useState<CurriculumPurpose>("simple_study");
+  const purpose: CurriculumPurpose = "simple_study";
   const [level, setLevel] = useState<UserLevel>("bachelor");
   const [knownConcepts, setKnownConcepts] = useState<string[]>([]);
   const [studyDays, setStudyDays] = useState(14);
@@ -46,10 +45,6 @@ export default function CurriculumSettingsPage() {
   }, [isAuthenticated, state.paper, state.curriculumId, router]);
 
   // 5.9 Use Functional setState - useCallback으로 안정적인 참조
-  const handlePurposeChange = useCallback((value: CurriculumPurpose) => {
-    setPurpose(value);
-  }, []);
-
   const handleLevelChange = useCallback((value: UserLevel) => {
     setLevel(value);
   }, []);
@@ -151,10 +146,7 @@ export default function CurriculumSettingsPage() {
           )}
 
           <div className='space-y-6'>
-            {/* 1. Purpose */}
-            <PurposeSection value={purpose} onChange={handlePurposeChange} />
-
-            {/* 2. Level */}
+            {/* 1. Level */}
             <LevelSection value={level} onChange={handleLevelChange} />
 
             {/* 3. Known Concepts */}

@@ -5,11 +5,9 @@ import { memo } from "react";
 
 // 6.3 Hoist Static JSX
 const LEVELS = [
-  { id: "non_major", label: "입문자", desc: "비전공자/처음 시작" },
-  { id: "bachelor", label: "학부생", desc: "기초 지식 보유" },
-  { id: "master", label: "대학원생", desc: "심화 학습 가능" },
-  { id: "researcher", label: "연구원", desc: "전문 연구 경험" },
-  { id: "industry", label: "현업", desc: "실무 적용 목적" },
+  { id: "non_major", label: "입문자", desc: "처음 시작하는 단계" },
+  { id: "bachelor", label: "중급자", desc: "기초 지식을 보유" },
+  { id: "master", label: "전문가", desc: "심화 학습 가능" },
 ] as const;
 
 interface LevelSectionProps {
@@ -29,7 +27,7 @@ export const LevelSection = memo(function LevelSection({
             school
           </span>
         </div>
-        <h2 className='text-lg font-bold'>2. 학습 수준</h2>
+        <h2 className='text-lg font-bold'>1. 학습 수준</h2>
       </div>
       <div className='flex flex-wrap gap-3'>
         {LEVELS.map(l => (

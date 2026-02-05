@@ -33,7 +33,7 @@ export const ResourcesSection = memo(function ResourcesSection({
             library_books
           </span>
         </div>
-        <h2 className='text-lg font-bold'>5. 선호 자료 형태</h2>
+        <h2 className='text-lg font-bold'>4. 선호 자료 형태</h2>
       </div>
       <div className='flex flex-col gap-3'>
         {RESOURCE_TYPES.map(r => (

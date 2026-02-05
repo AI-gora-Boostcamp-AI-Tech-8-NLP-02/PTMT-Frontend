@@ -42,7 +42,7 @@ export const KnownConceptsSection = memo(function KnownConceptsSection({
           </span>
         </div>
         <div>
-          <h2 className='text-lg font-bold'>3. 이미 알고 있는 개념</h2>
+          <h2 className='text-lg font-bold'>2. 이미 알고 있는 개념</h2>
         </div>
       </div>
       <p className='text-sm text-slate-500 mb-4 ml-13'>
