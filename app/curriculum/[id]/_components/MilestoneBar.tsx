@@ -3,6 +3,7 @@
 import { CurriculumNode } from "@/lib/types";
 import { memo, useCallback } from "react";
 import { RESOURCE_TYPE_ICONS } from "../../../../const/resourceType";
+import { InfoTooltip } from "../../settings/_components/InfoTooltip";
 
 interface NodePosition {
   x: number;
@@ -41,14 +42,21 @@ export const MilestoneBar = memo(function MilestoneBar({
             stars
           </span>
           <h3 className='font-bold text-slate-800 text-lg'>Starting Points</h3>
+          <InfoTooltip
+            content={
+              <span>
+                학습의 순서를 추천해드립니다. 순서대로 학습해보세요!
+              </span>
+            }
+          />
         </div>
         <span className='text-xs font-medium text-slate-400 bg-slate-50 px-3 py-1 rounded-full'>
           The Recommended Sequence
         </span>
       </div>
 
-      <div className='flex-1 flex items-center gap-6 overflow-x-auto px-8 py-2 min-w-0'>
-        <div className='flex flex-nowrap w-full justify-between min-w-max'>
+      <div className='flex-1 overflow-x-auto px-8 py-6 min-w-0 custom-scrollbar'>
+        <div className='flex flex-nowrap items-start gap-12 min-w-max'>
           {nodes.map((node, idx) => {
             const isSelected = selectedNodeId === node.keyword_id;
 
@@ -57,7 +65,7 @@ export const MilestoneBar = memo(function MilestoneBar({
                 key={node.keyword_id}
                 onClick={() => handleNodeClick(node)}
                 className={`
-                group flex flex-col items-center gap-3 min-w-25 transition-all duration-300 
+                group flex flex-col items-center gap-3 w-32 transition-all duration-300 
                 ${isSelected ? "scale-110 opacity-100" : "opacity-70 hover:opacity-100 hover:scale-105"}
               `}
               >
@@ -87,9 +95,9 @@ export const MilestoneBar = memo(function MilestoneBar({
                 </div>
 
                 {/* Label */}
-                <div className='text-center'>
+                <div className='text-center w-full px-1'>
                   <span
-                    className={`text-xs font-bold block whitespace-nowrap ${isSelected ? "text-blue-700" : "text-slate-600"}`}
+                    className={`text-xs font-bold block leading-snug break-keep ${isSelected ? "text-blue-700" : "text-slate-600"}`}
                   >
                     {node.keyword}
                   </span>

@@ -3,6 +3,7 @@
 import { ResourceType } from "@/lib/types";
 import { memo, useCallback } from "react";
 import { RESOURCE_TYPES } from "../../../../const/resourceType";
+import { InfoTooltip } from "./InfoTooltip";
 
 interface ResourcesSectionProps {
   selected: ResourceType[];
@@ -33,7 +34,22 @@ export const ResourcesSection = memo(function ResourcesSection({
             library_books
           </span>
         </div>
-        <h2 className='text-lg font-bold'>5. 선호 자료 형태</h2>
+        <div className='flex items-center gap-2'>
+          <h2 className='text-lg font-bold'>4. 선호 자료 형태</h2>
+          <InfoTooltip
+            content={
+              <span className='space-y-1'>
+                <span className='block'>선호하는 학습 자료 유형입니다.</span>
+                <span className='block'>
+                  <strong className='font-semibold text-slate-800'>
+                    선택한 유형의 자료 비중이 더 높아집니다
+                  </strong>
+                  .
+                </span>
+              </span>
+            }
+          />
+        </div>
       </div>
       <div className='flex flex-col gap-3'>
         {RESOURCE_TYPES.map(r => (

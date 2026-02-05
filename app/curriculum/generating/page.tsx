@@ -28,6 +28,9 @@ export default function GeneratingPage() {
   const startTimeRef = useRef<number | null>(null);
   const progressFloatRef = useRef(0);
   const lastTickRef = useRef<number | null>(null);
+  const hasFailedRef = useRef(false);
+  const hasCompletedRef = useRef(false);
+  const fillIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -53,6 +56,11 @@ export default function GeneratingPage() {
 
       if (elapsedSec >= 180) {
         setPollError("생성 시간이 초과되었습니다. 잠시 후 다시 시도해주세요.");
+
+        alert("생성 시간이 초과되었습니다.\n잠시 후 다시 시도해주세요.");
+
+        router.push("/curriculum/upload-paper");
+
         return;
       }
 
@@ -100,7 +108,11 @@ export default function GeneratingPage() {
         if (response.status === "ready") {
           setIsReady(true);
         } else if (response.status === "failed") {
-          setPollError("커리큘큘럼 생성에 실패했습니다.");
+          if (hasFailedRef.current) return;
+          hasFailedRef.current = true;
+          setPollError("커리큘럼 생성에 실패했습니다. 다시 시도해주세요.");
+          alert("커리큘럼 생성에 실패했습니다.\n다시 시도해주세요.");
+          router.push("/curriculum/upload-paper");
         }
       } catch (err) {
         if (!isActive) return;
@@ -124,20 +136,35 @@ export default function GeneratingPage() {
   useEffect(() => {
     if (!isReady || !state.curriculumId) return;
 
-    const fillInterval = setInterval(() => {
-      setProgress(prev => {
-        const next = Math.min(100, prev + 5);
-        if (next >= 100) {
-          clearInterval(fillInterval);
-          completeGeneration();
-          router.push(`/curriculum/${state.curriculumId}`);
-        }
-        return next;
-      });
+    if (fillIntervalRef.current) {
+      clearInterval(fillIntervalRef.current);
+    }
+
+    fillIntervalRef.current = setInterval(() => {
+      setProgress(prev => Math.min(100, prev + 5));
     }, 100);
 
-    return () => clearInterval(fillInterval);
-  }, [isReady, state.curriculumId, completeGeneration, router]);
+    return () => {
+      if (fillIntervalRef.current) {
+        clearInterval(fillIntervalRef.current);
+        fillIntervalRef.current = null;
+      }
+    };
+  }, [isReady, state.curriculumId]);
+
+  useEffect(() => {
+    if (!isReady || !state.curriculumId) return;
+    if (progress < 100) return;
+    if (hasCompletedRef.current) return;
+
+    hasCompletedRef.current = true;
+    if (fillIntervalRef.current) {
+      clearInterval(fillIntervalRef.current);
+      fillIntervalRef.current = null;
+    }
+    completeGeneration();
+    router.push(`/curriculum/${state.curriculumId}`);
+  }, [progress, isReady, state.curriculumId, completeGeneration, router]);
 
   if (authLoading || !isAuthenticated) {
     return <AuthLoading />;

@@ -18,11 +18,11 @@ export default function CurriculumListItemRow({
   return (
     <div
       onClick={() => onClick(item.id)}
-      className='group flex items-center gap-5 p-5 bg-white rounded-2xl border border-slate-200 hover:border-primary/30 hover:shadow-md transition-all cursor-pointer'
+      className='group flex items-center gap-4 p-5 bg-white rounded-xl border border-slate-200 hover:border-slate-300 hover:bg-slate-50/60 transition-colors cursor-pointer'
     >
       {/* Icon */}
-      <div className='size-12 shrink-0 rounded-xl bg-linear-to-br from-primary/20 to-accent/20 flex items-center justify-center'>
-        <span className='material-symbols-outlined text-xl text-primary'>
+      <div className='size-10 shrink-0 rounded-lg border border-slate-200 bg-white flex items-center justify-center'>
+        <span className='material-symbols-outlined text-lg text-slate-500'>
           psychology
         </span>
       </div>
@@ -44,7 +44,7 @@ export default function CurriculumListItemRow({
 
       <button
         onClick={e => onDelete(item.id, e)}
-        className='size-9 shrink-0 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-red-50 hover:text-red-500 opacity-0 group-hover:opacity-100'
+        className='size-9 shrink-0 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-red-50 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-colors'
       >
         <span className='material-symbols-outlined text-lg'>delete</span>
       </button>

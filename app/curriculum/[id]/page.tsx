@@ -85,6 +85,7 @@ export default function CurriculumGraphPage() {
 
   // 선택된 노드 상태
   const [selectedNode, setSelectedNode] = useState<CurriculumNode | null>(null);
+  const [isTutorialOpen, setIsTutorialOpen] = useState(true);
 
   // 그래프 레이아웃 계산 (커스텀 훅)
   const { positions: nodePositions } = useGraphLayout(
@@ -194,7 +195,41 @@ export default function CurriculumGraphPage() {
         />
 
         {/* Graph Area */}
-        <section className='flex-1 flex flex-col bg-[#f8fafc]'>
+        <section className='flex-1 flex flex-col bg-[#f8fafc] min-w-0 relative'>
+          {isTutorialOpen && (
+            <div className='absolute top-4 left-4 z-20 pointer-events-none'>
+              <div className='pointer-events-auto w-[280px] sm:w-[340px] rounded-2xl border border-rose-200/70 bg-white/90 shadow-xl shadow-rose-200/40 backdrop-blur px-4 py-3 animate-in fade-in slide-in-from-top-2'>
+                <div className='flex items-start justify-between gap-3'>
+                  <div className='inline-flex items-center gap-2 text-[11px] font-bold tracking-wider uppercase text-rose-600 bg-rose-50 border border-rose-100 px-2 py-1 rounded-full'>
+                    <span className='material-symbols-outlined text-sm'>
+                      tips_and_updates
+                    </span>
+                    튜토리얼
+                  </div>
+                  <button
+                    type='button'
+                    aria-label='튜토리얼 닫기'
+                    onClick={() => setIsTutorialOpen(false)}
+                    className='text-slate-400 hover:text-slate-700 transition-colors'
+                  >
+                    <span className='material-symbols-outlined text-base'>
+                      close
+                    </span>
+                  </button>
+                </div>
+                <p className='mt-3 text-xs text-slate-700 leading-relaxed'>
+                  <span className='font-semibold text-rose-600'>빨간색</span>으로
+                  표시된 학습 개념의 경우 해당 논문을 이해를 위해
+                  추천하는 학습 개념입니다. 해당 학습 개념을 중점적으로
+                  학습하시길 권장드립니다.
+                </p>
+                <div className='mt-3 flex items-center gap-2 text-[10px] text-slate-400'>
+                  <span className='w-2 h-2 rounded-full bg-rose-500' />
+                  추천 학습 개념
+                </div>
+              </div>
+            </div>
+          )}
           {/* SVG Graph Canvas */}
           <GraphCanvas
             nodes={graph.nodes}

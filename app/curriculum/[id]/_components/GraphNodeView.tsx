@@ -21,7 +21,7 @@ export function CurriculumNodeView({ data, selected }: Props) {
       )}
       <div
         className={`
-        relative min-w-65 rounded-4xl border bg-white px-5 py-15
+        relative min-w-80 max-w-150 rounded-4xl border bg-white px-5 py-15
         shadow-md transition-all duration-300 flex flex-col items-center justify-center text-center
         ${
           selected
@@ -41,7 +41,7 @@ export function CurriculumNodeView({ data, selected }: Props) {
 
         <div>
           {/* title */}
-          <h3 className='text-3xl font-bold text-slate-800 leading-snug mb-3 line-clamp-2'>
+          <h3 className='text-5xl font-bold text-slate-800 leading-snug mb-3 line-clamp-2'>
             {keyword}
           </h3>
 
@@ -52,7 +52,7 @@ export function CurriculumNodeView({ data, selected }: Props) {
                 className={`material-symbols-outlined text-4xl transition-colors ${
                   res.is_necessary ? "text-accent" : "text-slate-400"
                 }`}
-                style={{ fontSize: "56px" }}
+                style={{ fontSize: "60px" }}
               >
                 {RESOURCE_TYPE_ICONS[res.type] || "psychology"}
               </span>
