@@ -51,7 +51,7 @@ export const KnownConceptsSection = memo(function KnownConceptsSection({
                 <span className='block'>
                   입력한 개념은 커리큘럼의{" "}
                   <strong className='font-semibold text-slate-800'>
-                    필수 학습 키워드에서 제외됩니다
+                   추천 학습 키워드에서 제외됩니다
                   </strong>
                   .
                 </span>

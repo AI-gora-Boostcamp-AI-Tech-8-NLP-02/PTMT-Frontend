@@ -33,7 +33,7 @@ export const LevelSection = memo(function LevelSection({
           <InfoTooltip
             content={
               <span>
-                AI 도메인에 대한 배경지식 수준을 의미하며, 선택한 수준에 따라
+                목표 논문 도메인에 대한 배경지식 수준을 의미하며, 선택한 수준에 따라
                 기초 개념부터 논문에 직접 등장하는 세부 개념까지{" "}
                 <strong className='font-semibold text-slate-800'>
                   다루는 키워드의 수준과 그래프 깊이가 달라집니다

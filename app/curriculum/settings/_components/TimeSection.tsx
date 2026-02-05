@@ -1,7 +1,7 @@
 "use client";
 
-import { memo } from "react";
 import { Input } from "@/components/ui/input";
+import { memo } from "react";
 import { InfoTooltip } from "./InfoTooltip";
 
 interface TimeSectionProps {
@@ -33,7 +33,7 @@ export const TimeSection = memo(function TimeSection({
                 <span className="block">학습에 투자할 수 있는 총 시간입니다.</span>
                 <span className="block">
                   <strong className="font-semibold text-slate-800">
-                    시간이 길수록 필수 노드가 많아지고, 짧을수록 핵심만 남습니다
+                    시간이 길수록 추천 학습 키워드가 많아지고, 짧을수록 핵심만 남습니다
                   </strong>
                   .
                 </span>
