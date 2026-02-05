@@ -223,7 +223,7 @@ export const LEVEL_LABELS: Record<UserLevel, string> = {
 
 export const RESOURCE_TYPE_LABELS: Record<ResourceType, string> = {
   paper: "논문",
-  web_doc: "웹",
+  web_doc: "웹 자료",
   video: "영상",
 };
 

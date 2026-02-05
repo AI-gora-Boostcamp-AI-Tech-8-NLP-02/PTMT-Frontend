@@ -1,6 +1,6 @@
 export const RESOURCE_TYPES = [
   { id: "paper", label: "논문", icon: "description" },
-  { id: "web_doc", label: "웹", icon: "language" },
+  { id: "web_doc", label: "웹 자료", icon: "language" },
   { id: "video", label: "영상", icon: "play_circle" },
 ] as const;
 
