@@ -50,7 +50,6 @@ export interface User {
 export interface AuthResponse {
   user: User;
   access_token: string;
-  refresh_token: string;
   expires_in: number;
 }
 
@@ -126,7 +125,7 @@ export interface Resource {
   difficulty?: number;
   importance?: number;
   study_load_minutes?: number;
-  is_necessary?: boolean;
+  is_core?: boolean;
 }
 
 export interface CurriculumNode {
