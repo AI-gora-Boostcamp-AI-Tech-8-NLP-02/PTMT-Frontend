@@ -2,6 +2,7 @@ import { AuthProvider } from "@/lib/auth-context";
 import { CurriculumProvider } from "@/lib/curriculum-context";
 import "@xyflow/react/dist/style.css";
 import type { Metadata } from "next";
+import localFont from "next/font/local";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -18,6 +19,13 @@ export const metadata: Metadata = {
     "Map Tutor",
   ],
 };
+
+const pretendard = localFont({
+  src: "../public/fonts/PretendardVariable.woff2",
+  display: "swap",
+  weight: "45 920",
+  variable: "--font-pretendard",
+});
 
 export default function RootLayout({
   children,
@@ -37,12 +45,14 @@ export default function RootLayout({
           href='https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap'
           rel='stylesheet'
         />
-        <link
+        {/* <link
           href='https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Sora:wght@300;400;500;600;700&display=swap'
           rel='stylesheet'
-        />
+        /> */}
       </head>
-      <body className='antialiased min-h-screen'>
+      <body
+        className={`antialiased min-h-screen ${pretendard.className} ${pretendard.variable}`}
+      >
         <AuthProvider>
           <CurriculumProvider>{children}</CurriculumProvider>
         </AuthProvider>

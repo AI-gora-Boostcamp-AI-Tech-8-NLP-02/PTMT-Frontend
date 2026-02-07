@@ -1,5 +1,5 @@
 /* Google Fonts - Distinctive typography choices */
-@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Sora:wght@300;400;500;600;700&display=swap");
+/* @import url("https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Sora:wght@300;400;500;600;700&display=swap"); */
 @import url("./react-flow.css");
 
 @import "tailwindcss";
@@ -54,8 +54,8 @@
   --radius: 1rem;
 
   /* Distinctive Typography */
-  --font-sans: "Sora", sans-serif;
-  --font-display: "Outfit", sans-serif;
+  --font-sans: var(--font-pretendard), sans-serif;
+  --font-display: var(--font-pretendard), sans-serif;
 
   /* Pastel Color Palette - Soft Yellow + Coral + Sky Blue */
   --primary: oklch(0.88 0.12 85); /* Pastel Yellow/Gold */
