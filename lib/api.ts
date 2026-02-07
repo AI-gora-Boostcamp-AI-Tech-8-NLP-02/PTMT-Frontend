@@ -9,6 +9,7 @@ import {
   Keyword,
   LoginRequest,
   PaperUploadResponse,
+  QueueStatus,
   SignupRequest,
   User,
 } from "./types";
@@ -346,6 +347,12 @@ export const curriculumApi = {
     await httpRequest(`/curriculums/${curriculumId}`, {
       method: "DELETE",
     });
+  },
+};
+
+export const queueApi = {
+  async getStatus(): Promise<QueueStatus> {
+    return httpRequest<QueueStatus>("/curriculums/queue-status");
   },
 };
 

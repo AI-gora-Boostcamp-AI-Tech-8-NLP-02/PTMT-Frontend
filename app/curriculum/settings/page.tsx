@@ -6,7 +6,8 @@ import { useCallback, useEffect, useState } from "react";
 import { AuthLoading } from "@/components/auth/AuthLoading";
 import { Header } from "@/components/layout";
 import { Button } from "@/components/ui/button";
-import { useAuthGuard } from "@/hooks";
+import QueueStatusCard from "@/components/queue/QueueStatusCard";
+import { useAuthGuard, useQueueStatus } from "@/hooks";
 import { curriculumApi } from "@/lib/api";
 import { useCurriculum } from "@/lib/curriculum-context";
 import { CurriculumPurpose, ResourceType, UserLevel } from "@/lib/types";
@@ -22,6 +23,12 @@ export default function CurriculumSettingsPage() {
   const { isAuthenticated, isLoading: authLoading } = useAuthGuard();
   const router = useRouter();
   const { state, setOptions, startGeneration } = useCurriculum();
+  const {
+    status: queueStatus,
+    isLoading: queueLoading,
+    error: queueError,
+    lastUpdated,
+  } = useQueueStatus(3000, isAuthenticated);
 
   // State
   const purpose: CurriculumPurpose = "simple_study";
@@ -172,6 +179,18 @@ export default function CurriculumSettingsPage() {
 
             {/* Submit */}
             <div className='pt-6 pb-12'>
+              <QueueStatusCard
+                status={queueStatus}
+                isLoading={queueLoading}
+                error={queueError}
+                lastUpdated={lastUpdated}
+                className='mb-4'
+              />
+              {isSubmitting && (
+                <div className='mb-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-700'>
+                  키 배정 대기열 순서에 따라 생성이 시작됩니다. 잠시만 기다려주세요.
+                </div>
+              )}
               <Button
                 onClick={handleSubmit}
                 disabled={isSubmitting}

@@ -111,10 +111,12 @@ export default function PdfUploadTab({ setError }: PdfUploadTabProps) {
           </div>
           <div className='text-center'>
             <p className='text-lg font-bold mb-1'>
-              {isLoading ? "분석 중..." : "PDF를 여기에 드롭"}
+              {isLoading ? "키 배정 대기 및 분석 중..." : "PDF를 여기에 드롭"}
             </p>
             <p className='text-sm text-slate-500'>
-              {isLoading ? "잠시만 기다려주세요" : "또는 클릭하여 파일 선택"}
+              {isLoading
+                ? "요청량이 많으면 대기열 순서대로 처리됩니다"
+                : "또는 클릭하여 파일 선택"}
             </p>
           </div>
           <span className='text-xs font-medium text-slate-400 px-3 py-1.5 bg-white rounded-full'>
