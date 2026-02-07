@@ -126,7 +126,7 @@ export interface Resource {
   difficulty?: number;
   importance?: number;
   study_load_minutes?: number;
-  is_necessary?: boolean;
+  is_core?: boolean;
 }
 
 export interface CurriculumNode {

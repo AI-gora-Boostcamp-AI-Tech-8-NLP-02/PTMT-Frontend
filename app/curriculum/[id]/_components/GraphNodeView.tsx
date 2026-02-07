@@ -50,7 +50,7 @@ export function CurriculumNodeView({ data, selected }: Props) {
               <span
                 key={idx}
                 className={`material-symbols-outlined text-4xl transition-colors ${
-                  res.is_necessary ? "text-accent" : "text-slate-400"
+                  res.is_core ? "text-accent" : "text-slate-400"
                 }`}
                 style={{ fontSize: "60px" }}
               >
