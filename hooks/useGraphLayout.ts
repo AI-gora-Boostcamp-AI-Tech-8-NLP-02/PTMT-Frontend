@@ -200,15 +200,14 @@ export function useGraphLayout(
     };
 
     finalLayers.forEach((layer, layerIdx) => {
-      // 레이어 내 노드 수에 따라 Y축 분산 범위 동적 계산
+      const layerRatio = layerIdx / (finalLayers.length - 1 || 1);
       const nodeCount = layer.length;
-      const ySpread = Math.max(1000, nodeCount * NODE_HEIGHT * 0.7);
 
       const layerBaseX = layerIdx * LAYER_X_GAP + 100;
 
       // 부모 노드들의 위치를 기반으로 정렬 (Edge Crossing 최소화)
       const preferredY: Record<string, number> = {};
-      layer.forEach(nodeId => {
+      layer.forEach((nodeId, index) => {
         const parents = reverseAdj[nodeId] || [];
         let sumY = 0;
         let count = 0;
@@ -218,7 +217,27 @@ export function useGraphLayout(
             count++;
           }
         });
-        preferredY[nodeId] = count > 0 ? sumY / count : CANVAS_CENTER_Y;
+
+        // let targetY = count > 0 ? sumY / count : CANVAS_CENTER_Y;
+        let targetY = CANVAS_CENTER_Y;
+
+        if (count > 0) {
+          targetY = sumY / count;
+        } else {
+          // 부모가 없는 시작 노드들은 Y축으로 넓게 분산시켜 경로를 구분
+          const spread = Math.max(1600, layer.length * NODE_HEIGHT * 2.5);
+          const normalizedIndex =
+            layer.length > 1 ? index / (layer.length - 1) : 0.5;
+          targetY = CANVAS_CENTER_Y + (normalizedIndex - 0.5) * spread;
+        }
+
+        // 깊이에 따라 중앙으로 모이는 Funnel 효과 적용
+        // (경로는 유지하되, 논문 노드에 가까워질수록 중앙으로 수렴)
+        const centeringBias = Math.pow(layerRatio, 1.5);
+        targetY =
+          targetY * (1 - centeringBias) + CANVAS_CENTER_Y * centeringBias;
+
+        preferredY[nodeId] = targetY;
       });
 
       // Y좌표 기준 정렬
@@ -232,7 +251,7 @@ export function useGraphLayout(
         // 1. 랜덤 위치 시도 (최대 100회)
         for (let attempt = 0; attempt < 100; attempt++) {
           const xOffset = (random() - 0.5) * LAYER_X_JITTER * 2;
-          const yOffset = (random() - 0.5) * ySpread;
+          const yOffset = (random() - 0.5) * NODE_HEIGHT * 0.5; // 약간의 Y축 랜덤성 추가
 
           const x = layerBaseX + xOffset;
           const y = bestY + yOffset;
@@ -257,7 +276,7 @@ export function useGraphLayout(
             const sign = i % 2 === 0 ? -1 : 1;
             const step = Math.ceil(i / 2);
 
-            const y = bestY + sign * step * (NODE_HEIGHT * 1.25);
+            const y = bestY + sign * step * (NODE_HEIGHT * 0.5);
             // X축은 레이어 중심에서 약간 랜덤하게
             const x = layerBaseX + (random() - 0.5) * LAYER_X_JITTER;
 
