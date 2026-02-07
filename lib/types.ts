@@ -217,6 +217,8 @@ export interface QueueStatus {
   waiting_jobs: number;
   estimated_wait_seconds: number;
   next_available_in_seconds: number;
+  my_position: number | null;
+  my_status: "waiting" | "processing" | "unknown";
   slots: QueueSlotStatus[];
 }
 

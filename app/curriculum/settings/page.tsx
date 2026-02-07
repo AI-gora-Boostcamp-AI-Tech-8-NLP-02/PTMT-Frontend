@@ -5,8 +5,8 @@ import { useCallback, useEffect, useState } from "react";
 
 import { AuthLoading } from "@/components/auth/AuthLoading";
 import { Header } from "@/components/layout";
+import QueueWaitingModal from "@/components/queue/QueueWaitingModal";
 import { Button } from "@/components/ui/button";
-import QueueStatusCard from "@/components/queue/QueueStatusCard";
 import { useAuthGuard, useQueueStatus } from "@/hooks";
 import { curriculumApi } from "@/lib/api";
 import { useCurriculum } from "@/lib/curriculum-context";
@@ -23,12 +23,6 @@ export default function CurriculumSettingsPage() {
   const { isAuthenticated, isLoading: authLoading } = useAuthGuard();
   const router = useRouter();
   const { state, setOptions, startGeneration } = useCurriculum();
-  const {
-    status: queueStatus,
-    isLoading: queueLoading,
-    error: queueError,
-    lastUpdated,
-  } = useQueueStatus(3000, isAuthenticated);
 
   // State
   const purpose: CurriculumPurpose = "simple_study";
@@ -41,7 +35,18 @@ export default function CurriculumSettingsPage() {
     "web_doc",
   ]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isQueueModalClosed, setIsQueueModalClosed] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const {
+    status: queueStatus,
+    isLoading: queueLoading,
+    error: queueError,
+  } = useQueueStatus(
+    1000,
+    isSubmitting,
+    state.curriculumId,
+    "curriculum_generation"
+  );
 
   // 7.8 Early Return - paper 없으면 리다이렉트
   useEffect(() => {
@@ -50,6 +55,13 @@ export default function CurriculumSettingsPage() {
       router.push("/curriculum/upload-paper");
     }
   }, [isAuthenticated, state.paper, state.curriculumId, router]);
+
+  useEffect(() => {
+    if (!isSubmitting) return;
+    if (queueStatus?.my_status === "processing") {
+      router.push("/curriculum/generating");
+    }
+  }, [isSubmitting, queueStatus?.my_status, router]);
 
   // 5.9 Use Functional setState - useCallback으로 안정적인 참조
   const handleLevelChange = useCallback((value: UserLevel) => {
@@ -79,6 +91,7 @@ export default function CurriculumSettingsPage() {
       );
       return;
     }
+    setIsQueueModalClosed(false);
     setIsSubmitting(true);
     setSubmitError(null);
 
@@ -98,7 +111,6 @@ export default function CurriculumSettingsPage() {
       await curriculumApi.setOptions(state.curriculumId, options);
       startGeneration();
       await curriculumApi.startGeneration(state.curriculumId);
-      router.push("/curriculum/generating");
     } catch (err) {
       console.error("Failed to start generation:", err);
       setSubmitError(
@@ -118,7 +130,6 @@ export default function CurriculumSettingsPage() {
     preferredResources,
     setOptions,
     startGeneration,
-    router,
   ]);
 
   if (authLoading || !isAuthenticated) {
@@ -179,18 +190,6 @@ export default function CurriculumSettingsPage() {
 
             {/* Submit */}
             <div className='pt-6 pb-12'>
-              <QueueStatusCard
-                status={queueStatus}
-                isLoading={queueLoading}
-                error={queueError}
-                lastUpdated={lastUpdated}
-                className='mb-4'
-              />
-              {isSubmitting && (
-                <div className='mb-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-700'>
-                  키 배정 대기열 순서에 따라 생성이 시작됩니다. 잠시만 기다려주세요.
-                </div>
-              )}
               <Button
                 onClick={handleSubmit}
                 disabled={isSubmitting}
@@ -216,6 +215,15 @@ export default function CurriculumSettingsPage() {
           </div>
         </div>
       </main>
+      <QueueWaitingModal
+        open={isSubmitting && !isQueueModalClosed}
+        status={queueStatus}
+        isLoading={queueLoading}
+        error={queueError}
+        title='접수 대기 중입니다.'
+        subtitle='순서가 되면 커리큘럼 생성을 시작합니다.'
+        onClose={() => setIsQueueModalClosed(true)}
+      />
     </div>
   );
 }

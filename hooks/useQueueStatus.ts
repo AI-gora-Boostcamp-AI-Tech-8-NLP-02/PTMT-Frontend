@@ -13,7 +13,9 @@ interface UseQueueStatusResult {
 
 export function useQueueStatus(
   pollingMs = 3000,
-  enabled = true
+  enabled = true,
+  taskId?: string | null,
+  taskType?: "keyword_extraction" | "curriculum_generation"
 ): UseQueueStatusResult {
   const [status, setStatus] = useState<QueueStatus | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -34,7 +36,10 @@ export function useQueueStatus(
 
     const fetchQueueStatus = async () => {
       try {
-        const data = await queueApi.getStatus();
+        const data = await queueApi.getStatus({
+          task_id: taskId || undefined,
+          task_type: taskType,
+        });
         if (!isMounted) return;
         setStatus(data);
         setError(null);
@@ -60,7 +65,7 @@ export function useQueueStatus(
       isMounted = false;
       clearInterval(intervalId);
     };
-  }, [pollingMs, enabled]);
+  }, [pollingMs, enabled, taskId, taskType]);
 
   return {
     status,

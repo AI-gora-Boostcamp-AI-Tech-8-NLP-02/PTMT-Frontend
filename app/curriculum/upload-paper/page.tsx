@@ -2,8 +2,7 @@
 
 import { AuthLoading } from "@/components/auth/AuthLoading";
 import { Header } from "@/components/layout";
-import QueueStatusCard from "@/components/queue/QueueStatusCard";
-import { useAuthGuard, useQueueStatus } from "@/hooks";
+import { useAuthGuard } from "@/hooks";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import UploadTabs from "./_components/UploadTabs";
@@ -16,10 +15,6 @@ export default function UploadPaperPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("pdf");
   const [error, setError] = useState<string | null>(null);
-  const { status, isLoading, error: queueError, lastUpdated } = useQueueStatus(
-    3000,
-    isAuthenticated
-  );
 
   const handleBack = useCallback(() => {
     router.back();
@@ -69,13 +64,6 @@ export default function UploadPaperPage() {
                 </span>
               </div>
             )}
-            <QueueStatusCard
-              status={status}
-              isLoading={isLoading}
-              error={queueError}
-              lastUpdated={lastUpdated}
-              className='mx-8 mt-6'
-            />
             <UploadTabs
               activeTab={activeTab}
               setActiveTab={setActiveTab}

@@ -1,3 +1,5 @@
+import QueueWaitingModal from "@/components/queue/QueueWaitingModal";
+import { useQueueStatus } from "@/hooks";
 import { paperApi } from "@/lib/api";
 import { useCurriculum } from "@/lib/curriculum-context";
 import { TabsContent } from "@radix-ui/react-tabs";
@@ -14,16 +16,31 @@ export default function PdfUploadTab({ setError }: PdfUploadTabProps) {
 
   const [isDragging, setIsDragging] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isQueueModalClosed, setIsQueueModalClosed] = useState(false);
+  const [queueTaskId, setQueueTaskId] = useState<string | null>(null);
+  const { status, isLoading: queueLoading, error: queueError } = useQueueStatus(
+    3000,
+    isLoading,
+    queueTaskId,
+    "keyword_extraction"
+  );
 
   const { setPaper } = useCurriculum();
 
   const handleFileSelect = useCallback(
     async (file: File) => {
+      const taskId =
+        typeof crypto !== "undefined" && crypto.randomUUID
+          ? crypto.randomUUID()
+          : `pdf-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
+      setQueueTaskId(taskId);
+      setIsQueueModalClosed(false);
       setIsLoading(true);
       setError(null);
 
       try {
-        const response = await paperApi.uploadPdf(file);
+        const response = await paperApi.uploadPdf(file, taskId);
         setPaper(
           {
             paperId: response.paper_id,
@@ -36,6 +53,8 @@ export default function PdfUploadTab({ setError }: PdfUploadTabProps) {
         router.push("/curriculum/settings");
       } catch {
         setError("PDF 업로드에 실패했습니다.");
+        setIsQueueModalClosed(false);
+        setQueueTaskId(null);
         setIsLoading(false);
       }
     },
@@ -124,6 +143,15 @@ export default function PdfUploadTab({ setError }: PdfUploadTabProps) {
           </span>
         </div>
       </TabsContent>
+      <QueueWaitingModal
+        open={isLoading && !isQueueModalClosed}
+        status={status}
+        isLoading={queueLoading}
+        error={queueError}
+        title='접수 대기 중입니다.'
+        subtitle='순서가 되면 PDF 분석을 시작합니다.'
+        onClose={() => setIsQueueModalClosed(true)}
+      />
     </div>
   );
 }
