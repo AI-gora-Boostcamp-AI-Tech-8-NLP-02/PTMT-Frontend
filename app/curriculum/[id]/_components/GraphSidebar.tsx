@@ -193,7 +193,7 @@ export const GraphSidebar = memo(function GraphSidebar({
                         {selectedResource.importance}/10
                       </div>
                       <div className='text-[9px] text-slate-400 uppercase'>
-                        Impact
+                        Importance
                       </div>
                     </div>
                     <div className='text-center border-l border-slate-200'>
