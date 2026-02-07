@@ -7,7 +7,7 @@ import {
   useEffect,
   useState,
 } from "react";
-import { authApi, clearTokens, getAccessToken, userApi } from "./api";
+import { authApi, clearTokens, userApi } from "./api";
 import { User } from "./types";
 
 // ============================================
@@ -40,16 +40,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // 초기 로드 시 토큰 확인하여 사용자 정보 가져오기
   useEffect(() => {
     const initAuth = async () => {
-      const token = getAccessToken();
-      if (token) {
-        try {
-          const userData = await userApi.getProfile();
-          setUser(userData);
-        } catch (error) {
-          // 토큰이 유효하지 않으면 클리어
-          clearTokens();
-        }
+      try {
+        await authApi.refreshToken();
+        const userData = await userApi.getProfile();
+        setUser(userData);
+      } catch {
+        // 세션 복구 실패 시 인증 상태 초기화
+        clearTokens();
+        setUser(null);
       }
+
       setIsLoading(false);
     };
 
