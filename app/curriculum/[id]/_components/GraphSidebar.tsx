@@ -174,7 +174,7 @@ export const GraphSidebar = memo(function GraphSidebar({
                         <span className='text-[10px] font-bold text-slate-400 uppercase tracking-wider'>
                           {selectedResource.type}
                         </span>
-                        {selectedResource.is_necessary && (
+                        {selectedResource.is_core && (
                           <span className='text-[9px] font-bold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded'>
                             CORE
                           </span>
@@ -193,7 +193,7 @@ export const GraphSidebar = memo(function GraphSidebar({
                         {selectedResource.importance}/10
                       </div>
                       <div className='text-[9px] text-slate-400 uppercase'>
-                        Impact
+                        Importance
                       </div>
                     </div>
                     <div className='text-center border-l border-slate-200'>

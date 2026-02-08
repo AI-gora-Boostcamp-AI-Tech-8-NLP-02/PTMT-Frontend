@@ -102,6 +102,17 @@ export default function CurriculumGraphPage() {
       .filter((n): n is CurriculumNode => n !== undefined);
   }, [graph?.nodes, graph?.first_node_order]);
 
+  const coreStudyTimeHours = useMemo(() => {
+    if (!graph?.nodes) return 0;
+    const totalTime = graph.nodes.reduce((acc, node) => {
+      const nodeTotal = node.resources.reduce((resAcc, res) => {
+        return res.is_core ? resAcc + (res.study_load_minutes || 0) : resAcc;
+      }, 0);
+      return acc + nodeTotal;
+    }, 0);
+    return totalTime;
+  }, [graph?.nodes]);
+
   // 노드 선택 핸들러 (5.9 Use Functional setState - useCallback으로 안정적인 참조)
   const handleNodeSelect = useCallback((node: CurriculumNode) => {
     setSelectedNode(node);
@@ -148,8 +159,9 @@ export default function CurriculumGraphPage() {
               {graph.meta.paper_title}
             </h1>
             <p className='text-xs text-slate-500'>
-              {graph.nodes.length} Key Concepts •{" "}
-              {graph.meta.total_study_time_hours} Hours
+              {graph.nodes.length} Key Concepts • 전체 학습 시간:{" "}
+              {graph.meta.total_study_time_hours} Hours • 필수 학습 시간:{" "}
+              {coreStudyTimeHours} Hours
             </p>
           </div>
         </div>
@@ -198,7 +210,7 @@ export default function CurriculumGraphPage() {
         <section className='flex-1 flex flex-col bg-[#f8fafc] min-w-0 relative'>
           {isTutorialOpen && (
             <div className='absolute top-4 left-4 z-20 pointer-events-none'>
-              <div className='pointer-events-auto w-[280px] sm:w-[340px] rounded-2xl border border-rose-200/70 bg-white/90 shadow-xl shadow-rose-200/40 backdrop-blur px-4 py-3 animate-in fade-in slide-in-from-top-2'>
+              <div className='pointer-events-auto w-70 sm:w-85 rounded-2xl border border-rose-200/70 bg-white/90 shadow-xl shadow-rose-200/40 backdrop-blur px-4 py-3 animate-in fade-in slide-in-from-top-2'>
                 <div className='flex items-start justify-between gap-3'>
                   <div className='inline-flex items-center gap-2 text-[11px] font-bold tracking-wider uppercase text-rose-600 bg-rose-50 border border-rose-100 px-2 py-1 rounded-full'>
                     <span className='material-symbols-outlined text-sm'>
@@ -218,10 +230,10 @@ export default function CurriculumGraphPage() {
                   </button>
                 </div>
                 <p className='mt-3 text-xs text-slate-700 leading-relaxed'>
-                  <span className='font-semibold text-rose-600'>빨간색</span>으로
-                  표시된 학습 개념의 경우 해당 논문을 이해를 위해
-                  추천하는 학습 개념입니다. 해당 학습 개념을 중점적으로
-                  학습하시길 권장드립니다.
+                  <span className='font-semibold text-rose-600'>빨간색</span>
+                  으로 표시된 학습 개념의 경우 해당 논문을 이해를 위해 추천하는
+                  학습 개념입니다. 해당 학습 개념을 중점적으로 학습하시길
+                  권장드립니다.
                 </p>
                 <div className='mt-3 flex items-center gap-2 text-[10px] text-slate-400'>
                   <span className='w-2 h-2 rounded-full bg-rose-500' />

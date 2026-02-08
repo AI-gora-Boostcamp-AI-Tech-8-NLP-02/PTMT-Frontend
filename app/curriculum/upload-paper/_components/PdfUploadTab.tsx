@@ -1,3 +1,5 @@
+import QueueWaitingModal from "@/components/queue/QueueWaitingModal";
+import { useQueueStatus } from "@/hooks";
 import { paperApi } from "@/lib/api";
 import { useCurriculum } from "@/lib/curriculum-context";
 import { TabsContent } from "@radix-ui/react-tabs";
@@ -14,16 +16,31 @@ export default function PdfUploadTab({ setError }: PdfUploadTabProps) {
 
   const [isDragging, setIsDragging] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isQueueModalClosed, setIsQueueModalClosed] = useState(false);
+  const [queueTaskId, setQueueTaskId] = useState<string | null>(null);
+  const { status, isLoading: queueLoading, error: queueError } = useQueueStatus(
+    3000,
+    isLoading,
+    queueTaskId,
+    "keyword_extraction"
+  );
 
   const { setPaper } = useCurriculum();
 
   const handleFileSelect = useCallback(
     async (file: File) => {
+      const taskId =
+        typeof crypto !== "undefined" && crypto.randomUUID
+          ? crypto.randomUUID()
+          : `pdf-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
+      setQueueTaskId(taskId);
+      setIsQueueModalClosed(false);
       setIsLoading(true);
       setError(null);
 
       try {
-        const response = await paperApi.uploadPdf(file);
+        const response = await paperApi.uploadPdf(file, taskId);
         setPaper(
           {
             paperId: response.paper_id,
@@ -36,6 +53,8 @@ export default function PdfUploadTab({ setError }: PdfUploadTabProps) {
         router.push("/curriculum/settings");
       } catch {
         setError("PDF 업로드에 실패했습니다.");
+        setIsQueueModalClosed(false);
+        setQueueTaskId(null);
         setIsLoading(false);
       }
     },
@@ -111,10 +130,12 @@ export default function PdfUploadTab({ setError }: PdfUploadTabProps) {
           </div>
           <div className='text-center'>
             <p className='text-lg font-bold mb-1'>
-              {isLoading ? "분석 중..." : "PDF를 여기에 드롭"}
+              {isLoading ? "키 배정 대기 및 분석 중..." : "PDF를 여기에 드롭"}
             </p>
             <p className='text-sm text-slate-500'>
-              {isLoading ? "잠시만 기다려주세요" : "또는 클릭하여 파일 선택"}
+              {isLoading
+                ? "요청량이 많으면 대기열 순서대로 처리됩니다"
+                : "또는 클릭하여 파일 선택"}
             </p>
           </div>
           <span className='text-xs font-medium text-slate-400 px-3 py-1.5 bg-white rounded-full'>
@@ -122,6 +143,15 @@ export default function PdfUploadTab({ setError }: PdfUploadTabProps) {
           </span>
         </div>
       </TabsContent>
+      <QueueWaitingModal
+        open={isLoading && !isQueueModalClosed}
+        status={status}
+        isLoading={queueLoading}
+        error={queueError}
+        title='접수 대기 중입니다.'
+        subtitle='순서가 되면 PDF 분석을 시작합니다.'
+        onClose={() => setIsQueueModalClosed(true)}
+      />
     </div>
   );
 }

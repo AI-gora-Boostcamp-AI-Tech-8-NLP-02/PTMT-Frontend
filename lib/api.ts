@@ -9,6 +9,7 @@ import {
   Keyword,
   LoginRequest,
   PaperUploadResponse,
+  QueueStatus,
   SignupRequest,
   User,
 } from "./types";
@@ -25,33 +26,18 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 // ============================================
 
 let accessToken: string | null = null;
-let refreshToken: string | null = null;
+let refreshPromise: Promise<void> | null = null;
 
-export function setTokens(access: string, refresh: string) {
-  accessToken = access;
-  refreshToken = refresh;
-  // 실제 환경에서는 secure storage 사용 권장
-  if (typeof window !== "undefined") {
-    localStorage.setItem("access_token", access);
-    localStorage.setItem("refresh_token", refresh);
-  }
+export function setAccessToken(access: string | null) {
+  accessToken = access && access.trim() ? access : null;
 }
 
 export function getAccessToken(): string | null {
-  if (accessToken) return accessToken;
-  if (typeof window !== "undefined") {
-    return localStorage.getItem("access_token");
-  }
-  return null;
+  return accessToken;
 }
 
 export function clearTokens() {
   accessToken = null;
-  refreshToken = null;
-  if (typeof window !== "undefined") {
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("refresh_token");
-  }
 }
 
 // ============================================
@@ -68,10 +54,69 @@ interface ApiResponse<T> {
   };
 }
 
+function buildApiError<T>(json: ApiResponse<T>, status: number) {
+  const errorMessage = json.error?.message || `HTTP Error: ${status}`;
+  const error = new Error(errorMessage) as Error & {
+    status?: number;
+    code?: string;
+  };
+  error.status = status;
+  error.code = json.error?.code;
+  return error;
+}
+
+async function parseApiResponse<T>(response: Response): Promise<ApiResponse<T>> {
+  const text = await response.text();
+  const body = text.trim();
+
+  if (!body) {
+    return { success: response.ok };
+  }
+
+  try {
+    return JSON.parse(body) as ApiResponse<T>;
+  } catch {
+    return {
+      success: false,
+      error: { code: "PARSE_ERROR", message: "응답을 파싱할 수 없습니다." },
+    };
+  }
+}
+
+async function refreshAccessToken(): Promise<void> {
+  if (refreshPromise) {
+    await refreshPromise;
+    return;
+  }
+
+  refreshPromise = (async () => {
+    const response = await httpRequest<{
+      access_token: string;
+      expires_in: number;
+    }>(
+      "/auth/refresh",
+      {
+        method: "POST",
+      },
+      false,
+      false
+    );
+
+    setAccessToken(response.access_token);
+  })();
+
+  try {
+    await refreshPromise;
+  } finally {
+    refreshPromise = null;
+  }
+}
+
 async function httpRequest<T>(
   endpoint: string,
   options: RequestInit = {},
-  requireAuth = true
+  requireAuth = true,
+  allowAuthRetry = true
 ): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`;
 
@@ -87,40 +132,73 @@ async function httpRequest<T>(
     }
   }
 
-  const response = await fetch(url, {
-    ...options,
-    headers,
-  });
-
-  const text = await response.text();
-  const body = text.trim();
-  let json: ApiResponse<T>;
-  if (body) {
-    try {
-      json = JSON.parse(body) as ApiResponse<T>;
-    } catch {
-      json = {
-        success: false,
-        error: { code: "PARSE_ERROR", message: "응답을 파싱할 수 없습니다." },
-      };
-    }
-  } else {
-    json = { success: response.ok };
-  }
-
-  if (!response.ok || !json.success) {
-    const errorMessage =
-      json.error?.message || `HTTP Error: ${response.status}`;
-    const error = new Error(errorMessage) as Error & {
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      ...options,
+      headers,
+      credentials: "include",
+    });
+  } catch (err) {
+    const message =
+      err instanceof TypeError
+        ? "네트워크 연결이 끊겼습니다. 잠시 후 다시 시도해주세요."
+        : "요청 처리 중 네트워크 오류가 발생했습니다.";
+    const error = new Error(message) as Error & {
       status?: number;
       code?: string;
     };
-    error.status = response.status;
-    error.code = json.error?.code;
+    error.code = "NETWORK_ERROR";
     throw error;
   }
 
+  const json = await parseApiResponse<T>(response);
+
+  if (response.status === 401 && requireAuth && allowAuthRetry) {
+    try {
+      await refreshAccessToken();
+      return httpRequest<T>(endpoint, options, requireAuth, false);
+    } catch (refreshError) {
+      clearTokens();
+      throw refreshError;
+    }
+  }
+
+  if (!response.ok || !json.success) {
+    throw buildApiError(json, response.status);
+  }
+
   return json.data as T;
+}
+
+async function authFetch(
+  endpoint: string,
+  options: RequestInit = {},
+  allowAuthRetry = true
+): Promise<Response> {
+  const headers = new Headers(options.headers ?? {});
+  const token = getAccessToken();
+  if (token) {
+    headers.set("Authorization", `Bearer ${token}`);
+  }
+
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    ...options,
+    headers,
+    credentials: "include",
+  });
+
+  if (response.status === 401 && allowAuthRetry) {
+    try {
+      await refreshAccessToken();
+      return authFetch(endpoint, options, false);
+    } catch (refreshError) {
+      clearTokens();
+      throw refreshError;
+    }
+  }
+
+  return response;
 }
 
 function normalizeKeywords(keywords: unknown): Keyword[] {
@@ -166,7 +244,7 @@ export const authApi = {
       },
       false
     );
-    setTokens(response.access_token, response.refresh_token);
+    setAccessToken(response.access_token);
     return response;
   },
 
@@ -179,7 +257,7 @@ export const authApi = {
       },
       false
     );
-    setTokens(response.access_token, response.refresh_token);
+    setAccessToken(response.access_token);
     return response;
   },
 
@@ -189,13 +267,6 @@ export const authApi = {
   },
 
   async refreshToken(): Promise<{ access_token: string; expires_in: number }> {
-    const token =
-      refreshToken ||
-      (typeof window !== "undefined"
-        ? localStorage.getItem("refresh_token")
-        : null);
-    if (!token) throw new Error("No refresh token");
-
     const response = await httpRequest<{
       access_token: string;
       expires_in: number;
@@ -203,14 +274,11 @@ export const authApi = {
       "/auth/refresh",
       {
         method: "POST",
-        body: JSON.stringify({ refresh_token: token }),
       },
+      false,
       false
     );
-    accessToken = response.access_token;
-    if (typeof window !== "undefined") {
-      localStorage.setItem("access_token", response.access_token);
-    }
+    setAccessToken(response.access_token);
     return response;
   },
 };
@@ -240,14 +308,18 @@ export const userApi = {
 // ============================================
 
 export const paperApi = {
-  async uploadPdf(file: File): Promise<PaperUploadResponse> {
+  async uploadPdf(
+    file: File,
+    clientTaskId?: string
+  ): Promise<PaperUploadResponse> {
     const formData = new FormData();
     formData.append("file", file);
+    if (clientTaskId) {
+      formData.append("client_task_id", clientTaskId);
+    }
 
-    const token = getAccessToken();
-    const response = await fetch(`${API_BASE_URL}/papers/pdf`, {
+    const response = await authFetch("/papers/pdf", {
       method: "POST",
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
       body: formData,
     });
 
@@ -346,6 +418,21 @@ export const curriculumApi = {
     await httpRequest(`/curriculums/${curriculumId}`, {
       method: "DELETE",
     });
+  },
+};
+
+export const queueApi = {
+  async getStatus(options?: {
+    task_id?: string;
+    task_type?: "keyword_extraction" | "curriculum_generation";
+  }): Promise<QueueStatus> {
+    const params = new URLSearchParams();
+    if (options?.task_id) params.set("task_id", options.task_id);
+    if (options?.task_type) params.set("task_type", options.task_type);
+    const query = params.toString();
+    return httpRequest<QueueStatus>(
+      `/curriculums/queue-status${query ? `?${query}` : ""}`
+    );
   },
 };
 
