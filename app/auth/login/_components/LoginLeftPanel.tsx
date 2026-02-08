@@ -15,7 +15,7 @@ export default function LoginLeftPanel() {
       <div className='relative z-10 flex flex-col h-full justify-between p-12'>
         <Logo size='lg' inverted />
 
-        <div className='max-w-lg'>
+        <div className='max-w-2xl'>
           <h1 className='text-5xl font-black text-background mb-6'>
             나만의{" "}
             <span className='text-gradient-bold'>논문 학습 커리큘럼</span>을
