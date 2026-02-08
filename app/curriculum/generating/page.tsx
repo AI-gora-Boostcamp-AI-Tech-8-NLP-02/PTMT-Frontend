@@ -54,7 +54,7 @@ export default function GeneratingPage() {
         : 0;
       lastTickRef.current = now;
 
-      if (elapsedSec >= 180) {
+      if (elapsedSec >= 600) {
         setPollError("생성 시간이 초과되었습니다. 잠시 후 다시 시도해주세요.");
 
         alert("생성 시간이 초과되었습니다.\n잠시 후 다시 시도해주세요.");

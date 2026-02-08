@@ -9,6 +9,7 @@ import {
   Keyword,
   LoginRequest,
   PaperUploadResponse,
+  QueueStatus,
   SignupRequest,
   User,
 } from "./types";
@@ -131,11 +132,25 @@ async function httpRequest<T>(
     }
   }
 
-  const response = await fetch(url, {
-    ...options,
-    headers,
-    credentials: "include",
-  });
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      ...options,
+      headers,
+      credentials: "include",
+    });
+  } catch (err) {
+    const message =
+      err instanceof TypeError
+        ? "네트워크 연결이 끊겼습니다. 잠시 후 다시 시도해주세요."
+        : "요청 처리 중 네트워크 오류가 발생했습니다.";
+    const error = new Error(message) as Error & {
+      status?: number;
+      code?: string;
+    };
+    error.code = "NETWORK_ERROR";
+    throw error;
+  }
 
   const json = await parseApiResponse<T>(response);
 
@@ -293,9 +308,15 @@ export const userApi = {
 // ============================================
 
 export const paperApi = {
-  async uploadPdf(file: File): Promise<PaperUploadResponse> {
+  async uploadPdf(
+    file: File,
+    clientTaskId?: string
+  ): Promise<PaperUploadResponse> {
     const formData = new FormData();
     formData.append("file", file);
+    if (clientTaskId) {
+      formData.append("client_task_id", clientTaskId);
+    }
 
     const response = await authFetch("/papers/pdf", {
       method: "POST",
@@ -397,6 +418,21 @@ export const curriculumApi = {
     await httpRequest(`/curriculums/${curriculumId}`, {
       method: "DELETE",
     });
+  },
+};
+
+export const queueApi = {
+  async getStatus(options?: {
+    task_id?: string;
+    task_type?: "keyword_extraction" | "curriculum_generation";
+  }): Promise<QueueStatus> {
+    const params = new URLSearchParams();
+    if (options?.task_id) params.set("task_id", options.task_id);
+    if (options?.task_type) params.set("task_type", options.task_type);
+    const query = params.toString();
+    return httpRequest<QueueStatus>(
+      `/curriculums/queue-status${query ? `?${query}` : ""}`
+    );
   },
 };
 

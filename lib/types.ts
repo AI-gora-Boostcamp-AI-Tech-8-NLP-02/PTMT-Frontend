@@ -199,6 +199,28 @@ export interface GenerationStatus {
   current_step: string;
 }
 
+export interface QueueSlotStatus {
+  slot_number: number;
+  status: "ready" | "busy" | "cooldown";
+  cooldown_remaining_seconds: number;
+  current_task_type: string | null;
+  current_task_id: string | null;
+}
+
+export interface QueueStatus {
+  total_keys: number;
+  cooldown_seconds: number;
+  available_keys: number;
+  busy_keys: number;
+  cooldown_keys: number;
+  waiting_jobs: number;
+  estimated_wait_seconds: number;
+  next_available_in_seconds: number;
+  my_position: number | null;
+  my_status: "waiting" | "processing" | "unknown";
+  slots: QueueSlotStatus[];
+}
+
 // ============================================
 // UI Helper Types
 // ============================================
