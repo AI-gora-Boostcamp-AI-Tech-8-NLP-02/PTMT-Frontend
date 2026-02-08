@@ -110,7 +110,7 @@ export default function CurriculumGraphPage() {
       }, 0);
       return acc + nodeTotal;
     }, 0);
-    return totalTime;
+    return Math.round(totalTime * 100) / 100;
   }, [graph?.nodes]);
 
   // 노드 선택 핸들러 (5.9 Use Functional setState - useCallback으로 안정적인 참조)
